@@ -40,23 +40,23 @@ public class SettingsActivity extends AppCompatActivity {
         editTextUrl.setText(instances.get(0).Url);
     }
 
-    public void buttonSaveClicked(View view){
+    public void buttonSaveClicked(View view) {
         String url = editTextUrl.getText().toString();
 
-        if(!url.startsWith("http") || !url.contains(".")){
+        if (!url.startsWith("http") || !url.contains(".")) {
             Toast.makeText(getBaseContext(), "Invalid url", Toast.LENGTH_LONG).show();
             return;
         }
 
         DatabaseHelper.Instance instance = null;
 
-        for (DatabaseHelper.Instance item : instances){
-            if(item.Url.equalsIgnoreCase(url)) instance = item;
+        for (DatabaseHelper.Instance item : instances) {
+            if (item.Url.equalsIgnoreCase(url)) instance = item;
         }
 
-        if(instance == null){
+        if (instance == null) {
             databaseHelper.addInstance(url, true);
-        }else {
+        } else {
             databaseHelper.setAsDefault(instance);
         }
 

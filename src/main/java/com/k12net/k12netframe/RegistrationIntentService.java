@@ -74,7 +74,7 @@ public class RegistrationIntentService extends IntentService {
 
     /**
      * Persist registration to third-party servers.
-     *
+     * <p/>
      * Modify this method to associate the user's GCM registration token with any server-side account
      * maintained by your application.
      *
@@ -91,7 +91,7 @@ public class RegistrationIntentService extends IntentService {
         registerTask.execute(instance, cookies[0], token);
     }
 
-    private class RegisterTask extends AsyncTask<String, Void, Boolean>{
+    private class RegisterTask extends AsyncTask<String, Void, Boolean> {
         private static final String K12NETAndroidID = "9c260947-ba8f-e511-bf62-3c15c2ddcd05";
         private String instance;
         private String cookie;
@@ -106,7 +106,7 @@ public class RegistrationIntentService extends IntentService {
             return tryRegister();
         }
 
-        private Boolean tryRegister(){
+        private Boolean tryRegister() {
             try {
                 URL url = new URL(instance + "/SPSL.Web/SPSL.Web/ClientBin/Yuce-K12NET-SPSL-Web-AuthenticationService.svc/json/GetUser");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -118,7 +118,7 @@ public class RegistrationIntentService extends IntentService {
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
 
-                while ((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     stringBuilder.append(line + "\n");
                 }
 
@@ -130,7 +130,7 @@ public class RegistrationIntentService extends IntentService {
                 String ID = user.getString("ProviderUserKey");
 
                 //url = new URL(instance + "/SPSL.Web/ClientBin/Yuce-K12NET-SPServicesLibrary-SPDomainService.svc/json/GetPersonalInfo_ElectronicIdsExpanded?propertyPath=ElectronicId&$where=it.PersonalInfoID==Guid(%22" + ID +"%22)");
-                url = new URL(instance + "/SPSL.Web/ClientBin/Yuce-K12NET-SPServicesLibrary-SPDomainService.svc/json/GetPersonalInfo_ElectronicIdsExpanded?propertyPath=ElectronicId&$where=it.PersonalInfoID==Guid(%22" + ID +"%22)%2526%2526it.ElectronicId.TypeId==Guid(%22" + K12NETAndroidID + "%22) ");
+                url = new URL(instance + "/SPSL.Web/ClientBin/Yuce-K12NET-SPServicesLibrary-SPDomainService.svc/json/GetPersonalInfo_ElectronicIdsExpanded?propertyPath=ElectronicId&$where=it.PersonalInfoID==Guid(%22" + ID + "%22)%2526%2526it.ElectronicId.TypeId==Guid(%22" + K12NETAndroidID + "%22) ");
                 connection = (HttpURLConnection) url.openConnection();
 
                 connection.setRequestProperty("Cookie", this.cookie);
@@ -139,7 +139,7 @@ public class RegistrationIntentService extends IntentService {
 
                 stringBuilder = new StringBuilder();
 
-                while ((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     stringBuilder.append(line + "\n");
                 }
 
@@ -151,15 +151,15 @@ public class RegistrationIntentService extends IntentService {
 
                 JSONObject electronicId = null;
 
-                for (int index = 0; index < electronicIds.length(); index++){
+                for (int index = 0; index < electronicIds.length(); index++) {
                     JSONObject item = electronicIds.getJSONObject(index);
 
-                    if(token.equals(item.getString("Value"))) electronicId = item;
+                    if (token.equals(item.getString("Value"))) electronicId = item;
                 }
 
-                if(electronicId != null) return true;
+                if (electronicId != null) return true;
 
-                String changesSet = "{\"changeSet\":[{\"Entity\":{\"__type\":\"PersonalInfo_ElectronicId:#Yuce.K12NET.SPServicesLibrary\",\"ElectronicIdID\":\"00000000-0000-0000-0000-000000000000\",\"PersonalInfoID\":\"" + ID + "\"},\"HasMemberChanges\":false,\"Operation\":2,\"Id\":0,\"Associations\":[{\"Key\":\"ElectronicId\",\"Value\":[1]}]},{\"Entity\":{\"__type\":\"ElectronicId:#Yuce.K12NET.SPServicesLibrary\",\"ID\":\"00000000-0000-0000-0000-000000000000\",\"TypeID\":\"" + K12NETAndroidID + "\",\"Value\":\"" + token +"\"},\"HasMemberChanges\":false,\"Operation\":2,\"Id\":1}]}";
+                String changesSet = "{\"changeSet\":[{\"Entity\":{\"__type\":\"PersonalInfo_ElectronicId:#Yuce.K12NET.SPServicesLibrary\",\"ElectronicIdID\":\"00000000-0000-0000-0000-000000000000\",\"PersonalInfoID\":\"" + ID + "\"},\"HasMemberChanges\":false,\"Operation\":2,\"Id\":0,\"Associations\":[{\"Key\":\"ElectronicId\",\"Value\":[1]}]},{\"Entity\":{\"__type\":\"ElectronicId:#Yuce.K12NET.SPServicesLibrary\",\"ID\":\"00000000-0000-0000-0000-000000000000\",\"TypeID\":\"" + K12NETAndroidID + "\",\"Value\":\"" + token + "\"},\"HasMemberChanges\":false,\"Operation\":2,\"Id\":1}]}";
 
                 byte[] postData = changesSet.getBytes(Charset.forName("UTF-8"));
                 int postDataLength = postData.length;
@@ -187,14 +187,14 @@ public class RegistrationIntentService extends IntentService {
 
                 stringBuilder = new StringBuilder();
 
-                while ((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     stringBuilder.append(line + "\n");
                 }
 
                 bufferedReader.close();
 
                 String response = stringBuilder.toString();
-            }catch (Exception e){
+            } catch (Exception e) {
                 return false;
             }
 

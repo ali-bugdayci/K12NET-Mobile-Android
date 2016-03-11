@@ -33,7 +33,7 @@ public class DefaultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_default);
 
-        webView = (WebView)findViewById(R.id.webViewDefault);
+        webView = (WebView) findViewById(R.id.webViewDefault);
 
         this.Navigate();
     }
@@ -45,7 +45,7 @@ public class DefaultActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void Navigate(){
+    private void Navigate() {
         webView.getSettings().setJavaScriptEnabled(true);
 
         webView.setWebViewClient(new WebViewClient() {
@@ -70,13 +70,13 @@ public class DefaultActivity extends AppCompatActivity {
         String url = getIntent().getStringExtra("Url");
         String[] cookies = getIntent().getStringArrayExtra("Cookies");
 
-        for (String cookie : cookies){
-            Integer domainIndex =  cookie.indexOf("domain=");
-            if(domainIndex != -1){
+        for (String cookie : cookies) {
+            Integer domainIndex = cookie.indexOf("domain=");
+            if (domainIndex != -1) {
                 Integer endIndex = cookie.indexOf(";", domainIndex);
-                String domain = cookie.substring(domainIndex + 7,endIndex);
+                String domain = cookie.substring(domainIndex + 7, endIndex);
                 cookieManager.setCookie(domain, cookie);
-            }else {
+            } else {
                 cookieManager.setCookie(url, cookie);
             }
         }
@@ -87,7 +87,7 @@ public class DefaultActivity extends AppCompatActivity {
         registerNotification(url, cookies);
     }
 
-    private void ReLogin(){
+    private void ReLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
 
         intent.putExtra("IsLoggedOut", this.isLoggedOut);
@@ -95,7 +95,7 @@ public class DefaultActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private  void registerNotification(String url, String[] cookies){
+    private void registerNotification(String url, String[] cookies) {
 
         registrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -103,9 +103,9 @@ public class DefaultActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                 boolean sentToken = sharedPreferences.getBoolean("sentTokenToServer", false);
                 if (sentToken) {
-                    String x="sent";
+                    String x = "sent";
                 } else {
-                    String y="token_error_message";
+                    String y = "token_error_message";
                 }
             }
         };
@@ -125,8 +125,8 @@ public class DefaultActivity extends AppCompatActivity {
         }
     }
 
-    private void registerReceiver(){
-        if(!isReceiverRegistered) {
+    private void registerReceiver() {
+        if (!isReceiverRegistered) {
             LocalBroadcastManager.getInstance(this).registerReceiver(registrationBroadcastReceiver, new IntentFilter("registrationComplete"));
             isReceiverRegistered = true;
         }

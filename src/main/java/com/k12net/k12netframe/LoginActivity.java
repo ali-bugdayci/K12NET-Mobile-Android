@@ -54,11 +54,11 @@ public class LoginActivity extends AppCompatActivity {
         switchRememberMe = (Switch) findViewById(R.id.switchRememberMe);
         buttonForgetMe = (Button) findViewById(R.id.buttonForgetMe);
         loginButton = (Button) findViewById(R.id.loginButton);
-        progressBarLogin=(ProgressBar) findViewById(R.id.progressBarLogin);
+        progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
 
 
-        if(!this.isConnected()){
-            Toast.makeText(this,"You are not connected.",Toast.LENGTH_LONG).show();
+        if (!this.isConnected()) {
+            Toast.makeText(this, "You are not connected.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -90,12 +90,12 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void rememberUser(){
+    private void rememberUser() {
         databaseHelper = new DatabaseHelper(this, 3);
 
         userProfiles = databaseHelper.GetUserProfiles();
 
-        if(userProfiles.size() == 0) {
+        if (userProfiles.size() == 0) {
             switchRememberMe.setVisibility(View.VISIBLE);
             buttonForgetMe.setVisibility(View.INVISIBLE);
 
@@ -114,19 +114,20 @@ public class LoginActivity extends AppCompatActivity {
 
         boolean isLoggedOut = getIntent().getBooleanExtra("IsLoggedOut", false);
 
-        if(!isLoggedOut){
+        if (!isLoggedOut) {
             loginButtonClicked(null);
         }
     }
 
-    public void persistUser(){
+    public void persistUser() {
         DatabaseHelper.UserProfile userProfile = null;
 
-        for (DatabaseHelper.UserProfile profile : userProfiles){
-            if(profile.Username.equalsIgnoreCase(editTextUsername.getText().toString())) userProfile = profile;
+        for (DatabaseHelper.UserProfile profile : userProfiles) {
+            if (profile.Username.equalsIgnoreCase(editTextUsername.getText().toString()))
+                userProfile = profile;
         }
 
-        if(userProfile == null){
+        if (userProfile == null) {
             databaseHelper.addUserProfile(editTextUsername.getText().toString(), editTextPassword.getText().toString());
         } else {
             userProfile.Username = editTextUsername.getText().toString();
@@ -137,14 +138,15 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void buttonForgetMeClicked(View view){
+    public void buttonForgetMeClicked(View view) {
         DatabaseHelper.UserProfile userProfile = null;
 
-        for (DatabaseHelper.UserProfile profile : userProfiles){
-            if(profile.Username.equalsIgnoreCase(editTextUsername.getText().toString())) userProfile = profile;
+        for (DatabaseHelper.UserProfile profile : userProfiles) {
+            if (profile.Username.equalsIgnoreCase(editTextUsername.getText().toString()))
+                userProfile = profile;
         }
 
-        if(userProfile != null) databaseHelper.delete(userProfile);
+        if (userProfile != null) databaseHelper.delete(userProfile);
 
         rememberUser();
 
@@ -154,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextPassword.setEnabled(true);
     }
 
-    public void loginButtonClicked(View view){
+    public void loginButtonClicked(View view) {
         loginButton.setEnabled(false);
         this.progressBarLogin.setVisibility(View.VISIBLE);
 
@@ -168,14 +170,11 @@ public class LoginActivity extends AppCompatActivity {
         task.execute(instances);
     }
 
-    private boolean isConnected(){
+    private boolean isConnected() {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     private class LoginTask extends AsyncTask<List<DatabaseHelper.Instance>, Void, Boolean> {
@@ -188,31 +187,32 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(List<DatabaseHelper.Instance>... params) {
-            for(DatabaseHelper.Instance instance : params[0]){
+            for (DatabaseHelper.Instance instance : params[0]) {
                 this.Instance = instance;
 
-                if(this.tryAuthenticate()){
+                if (this.tryAuthenticate()) {
                     return true;
                 }
             }
 
             return false;
         }
+
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(Boolean result) {
-            if(result){
-                Intent intent = new Intent(getBaseContext(),DefaultActivity.class);
+            if (result) {
+                Intent intent = new Intent(getBaseContext(), DefaultActivity.class);
 
                 intent.putExtra("Url", this.Instance.Url);
                 intent.putExtra("Cookies", this.Cookies.toArray(new String[this.Cookies.size()]));
 
                 startActivity(intent);
 
-                if(switchRememberMe.isChecked()) persistUser();
+                if (switchRememberMe.isChecked()) persistUser();
 
-                if(!this.Instance.IsSelected) databaseHelper.setAsDefault(this.Instance);
-            }else{
+                if (!this.Instance.IsSelected) databaseHelper.setAsDefault(this.Instance);
+            } else {
                 Toast.makeText(getBaseContext(), "Invalid credentials.", Toast.LENGTH_LONG).show();
             }
 
@@ -220,13 +220,13 @@ public class LoginActivity extends AppCompatActivity {
             progressBarLogin.setVisibility(View.INVISIBLE);
         }
 
-        private boolean tryAuthenticate(){
-            String urlParameters  = "{\"userName\":\""+ this.Username +"\",\"password\":\"" + this.Password + "\",\"createPersistentCookie\":false}";
+        private boolean tryAuthenticate() {
+            String urlParameters = "{\"userName\":\"" + this.Username + "\",\"password\":\"" + this.Password + "\",\"createPersistentCookie\":false}";
 
             byte[] postData = urlParameters.getBytes(Charset.forName("UTF-8"));
             int postDataLength = postData.length;
 
-            try{
+            try {
                 URL url = new URL(this.Instance.Url + "/Authentication_JSON_AppService.axd/Login");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -234,7 +234,7 @@ public class LoginActivity extends AppCompatActivity {
                 connection.setInstanceFollowRedirects(false);
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                connection.setRequestProperty( "charset", "utf-8");
+                connection.setRequestProperty("charset", "utf-8");
                 connection.setRequestProperty("Content-Length", Integer.toString(postDataLength));
                 connection.setUseCaches(false);
 
@@ -249,7 +249,7 @@ public class LoginActivity extends AppCompatActivity {
                     String line;
                     StringBuffer stringBuffer = new StringBuffer();
 
-                    while((line = reader.readLine()) != null) {
+                    while ((line = reader.readLine()) != null) {
                         stringBuffer.append(line);
                         stringBuffer.append('\r');
                     }
@@ -257,20 +257,20 @@ public class LoginActivity extends AppCompatActivity {
 
                     String response = stringBuffer.toString();
 
-                    if(response.contains("{\"d\":true}")){
+                    if (response.contains("{\"d\":true}")) {
                         this.Cookies = connection.getHeaderFields().get("Set-Cookie");
                         return true;
-                    }else {
+                    } else {
                         this.Messages.add("Invalid credentials.");
                         return false;
                     }
 
-                } catch (Exception e1){
+                } catch (Exception e1) {
                     this.Messages.add(e1.toString());
                     return false;
                 }
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 this.Messages.add(e.toString());
                 return false;
             }

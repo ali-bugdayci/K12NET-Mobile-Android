@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public List<UserProfile> GetUserProfiles(){
+    public List<UserProfile> GetUserProfiles() {
         List<UserProfile> list = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
 
@@ -44,10 +45,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
 
-        while (!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             UserProfile userProfile = new UserProfile();
 
-            userProfile.ID=cursor.getInt(0);
+            userProfile.ID = cursor.getInt(0);
             userProfile.Username = cursor.getString(1);
             userProfile.Password = cursor.getString(2);
             userProfile.LastLoginTime = cursor.getLong(3);
@@ -60,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public void addUserProfile(String username, String password){
+    public void addUserProfile(String username, String password) {
         ContentValues values = new ContentValues();
 
         values.put("Username", username);
@@ -72,21 +73,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void update(UserProfile userProfile){
+    public void update(UserProfile userProfile) {
         SQLiteDatabase db = getWritableDatabase();
 
         db.execSQL("UPDATE UserProfile SET Username = '" + userProfile.Username + "', Password = '" + userProfile.Password + "', LastLoginTime = " + userProfile.LastLoginTime.toString() + " WHERE ID = " + userProfile.ID.toString());
         db.close();
     }
 
-    public void delete(UserProfile userProfile){
+    public void delete(UserProfile userProfile) {
         SQLiteDatabase db = getWritableDatabase();
 
         db.execSQL("DELETE FROM UserProfile WHERE ID = " + userProfile.ID.toString());
         db.close();
     }
 
-    public List<Instance> GetInstances(){
+    public List<Instance> GetInstances() {
         List<Instance> list = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
 
@@ -94,10 +95,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
 
-        while (!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             Instance instance = new Instance();
 
-            instance.ID=cursor.getInt(0);
+            instance.ID = cursor.getInt(0);
             instance.Url = cursor.getString(1);
             instance.IsSelected = cursor.getInt(2) == 1;
 
@@ -109,7 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public void addInstance(String url, Boolean isSelected){
+    public void addInstance(String url, Boolean isSelected) {
         ContentValues values = new ContentValues();
 
         values.put("Url", url);
@@ -117,21 +118,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Boolean isdbCreated = false;
 
-        if(db == null) {
+        if (db == null) {
             db = getWritableDatabase();
             isdbCreated = true;
         }
 
-        if(isSelected){
+        if (isSelected) {
             db.execSQL("UPDATE Instance SET IsSelected = 0");
         }
 
         db.insert("Instance", null, values);
 
-        if(isdbCreated) db.close();
+        if (isdbCreated) db.close();
     }
 
-    public void setAsDefault(Instance instance){
+    public void setAsDefault(Instance instance) {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("UPDATE Instance SET IsSelected = 0");
         db.execSQL("UPDATE Instance SET IsSelected = 1 WHERE ID = " + instance.ID.toString());
