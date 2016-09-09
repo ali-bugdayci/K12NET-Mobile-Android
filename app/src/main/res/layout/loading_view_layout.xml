@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="horizontal" >
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="@style/Asisto_SmallBusyIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp" />
+
+        <com.atlas.k12net.component.AsistoTextView
+            android:id="@+id/txt_homewrok_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/loading_please_wait"
+            android:textAppearance="@style/Asisto_SmallLabel" />
+
+    </LinearLayout>
+
+    

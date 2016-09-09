@@ -1,0 +1,20 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="busy_indicator_thickness">16dp</dimen>
+    <dimen name="busy_indicator_inner_radius">92dp</dimen>
+    <dimen name="coverflowHeight">250dp</dimen>
+     <dimen name="coverflowWidth">200dp</dimen>
+     <dimen name="dashmenuIconSize">40dp</dimen>
+     <dimen name="dashmenuButtonSize">36dp</dimen>
+     <dimen name="dashmenuTitleHeight">56dp</dimen>
+      <dimen name="titleTextSize">16sp</dimen>
+      <dimen name="subtitleTextSize">12sp</dimen>
+     <dimen name="profilePicture">72dp</dimen>
+     <dimen name="asistoTextViewMediumSize">14sp</dimen>
+     <dimen name="coverFlowTitle">13sp</dimen>
+     <dimen name="coverFlowSubtitle">10sp</dimen>
+     <dimen name="coverFlowStudentIcon">96dp</dimen>
+     <dimen name="coverFlowSchoolIcon">48dp</dimen>
+</resources>

@@ -1,0 +1,28 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="busy_indicator_thickness">16dp</dimen>
+    <dimen name="busy_indicator_inner_radius">92dp</dimen>
+    <dimen name="coverflowHeight">200dp</dimen>
+    <dimen name="coverflowWidth">180dp</dimen>
+    <dimen name="dashmenuIconSize">40dp</dimen>
+    <dimen name="smallPieChart">72dp</dimen>
+    <dimen name="largePieChart">128dp</dimen>
+    <dimen name="dashmenuButtonSize">36dp</dimen>
+    <dimen name="dashmenuTitleHeight">40dp</dimen>
+    <dimen name="titleTextSize">16sp</dimen>
+    <dimen name="subtitleTextSize">12sp</dimen>
+    <dimen name="profilePicture">72dp</dimen>
+    <dimen name="asistoTextViewMediumSize">14sp</dimen>
+    <dimen name="coverFlowTitle">10sp</dimen>
+    <dimen name="coverFlowSubtitle">8sp</dimen>
+    <dimen name="coverFlowStudentIcon">72dp</dimen>
+    <dimen name="coverFlowSchoolIcon">48dp</dimen>
+    <dimen name="dialogWidth">480dp</dimen>
+    <dimen name="dialogHeight">592dp</dimen>
+    <dimen name="table_row_width">100dp</dimen>
+    <dimen name="attachment_layout_height">150dp</dimen>
+    <dimen name="screen_size_width_limit">670dp</dimen>
+    <dimen name="dialogTitleHeight">48dp</dimen>
+</resources>

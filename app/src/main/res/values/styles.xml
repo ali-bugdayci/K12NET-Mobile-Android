@@ -1,0 +1,254 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--     <style name="AppTheme" parent="@android:style/Theme.Light.NoTitleBar.Fullscreen"> -->
+<!--         <item name="android:windowNoTitle">true</item> -->
+<!--     </style> -->
+    
+        
+    <style name="AppTheme"  parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowNoTitle">true</item>
+        <!--  <item name="android:colorPrimary">#005555</item>-->
+      <!--    <item name="android:colorPrimaryDark">#04b7bb</item>-->
+    </style>
+
+    <style name="Asisto_Button">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/torquese_button</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">250dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">@style/Asisto_ButtonLabel</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="Asisto_ButtonBorderless">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/torquese_button_borderless</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">250dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">@style/Asisto_ButtonLabel</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="Asisto_SmallButton">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/torquese_toggle_button</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_marginRight">1dp</item>
+        <item name="android:layout_marginTop">1dp</item>
+        <item name="android:textAppearance">@style/Asisto_SmallTinyLabel</item>
+    </style>
+
+    <style name="Asisto_TextBox">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/asisto_textbox_background</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">250dp</item>
+        <item name="android:layout_marginBottom">5dip</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAppearance">@style/Asisto_MediumLabel</item>
+        <item name="android:textColor">#017987</item>
+    </style>
+    
+    <style name="Asisto_TextBoxSmall">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/asisto_textbox_background</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="Asisto_ButtonLabel">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Asisto_BigLabel">
+        <item name="android:textSize">28sp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    
+    <style name="Asisto_BigLabelWhite">
+        <item name="android:textSize">28sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Asisto_MediumLabel">
+        <item name="android:textSize">@dimen/asistoTextViewMediumSize</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#04b7bb</item>
+    </style>
+
+    <style name="Asisto_BigMediumLabel">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#04b7bb</item>
+    </style>
+
+    <style name="Asisto_BigMediumLabelWhite" parent="Asisto_BigMediumLabel">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="Asisto_MediumSmallLabel">
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Asisto_MediumInvertedLabel">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">#04b7bb</item>
+    </style>
+
+    <style name="Asisto_MediumSmallLabelPurple">
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#8f81a4</item>
+    </style>
+
+    <style name="Asisto_SmallTinyLabelPurple" parent="Asisto_MediumSmallLabelPurple">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="Asisto_SmallLabel">
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Asisto_SmallTinyLabel">
+        <item name="android:textSize">11sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+    <style name="Asisto_TinyLabel">
+        <item name="android:textSize">8sp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="Asisto_TinyLabelWhite">
+        <item name="android:textSize">8sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="Asisto_SmallTinyLabelWhite" parent="@style/Asisto_SmallTinyLabel">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="Asisto_MediumLabelWhite" parent="@style/Asisto_MediumLabel">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Asisto_SmallLabelWhite">
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Asisto_BusyIndicator" parent="@android:attr/progressBarStyleLarge">
+        <item name="android:indeterminateDrawable">@drawable/progress</item>
+        <item name="android:layout_height">128dip</item>
+        <item name="android:layout_width">128dip</item>
+        <item name="android:maxWidth">128dip</item>
+        <item name="android:maxHeight">128dip</item>
+    </style>
+
+    <style name="Asisto_SmallBusyIndicator" parent="@android:attr/progressBarStyleLarge">
+        <item name="android:indeterminateDrawable">@drawable/progress</item>
+        <item name="android:layout_height">48dip</item>
+        <item name="android:layout_width">48dip</item>
+        <item name="android:maxWidth">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+    </style>
+
+    <style name="Asisto_ScrollLayout">
+        <item name="android:background">#c4f8ff</item>
+    </style>
+
+    <style name="Asisto_DialogLayout">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:background">#FFFFFF</item>
+    </style>
+
+    <style name="Asisto_SelectionBarLayout">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">#51c1d1</item>
+    </style>
+
+    <style name="Asisto_SelectionBarLayoutAlternative">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">#9f51d1</item>
+    </style>
+
+    <style name="Asisto_SelectionLabel">
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:padding">10dip</item>
+    </style>
+
+    <style name="Asisto_PopupDialogTurquase" parent="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+        <item name="android:windowAnimationStyle">@style/Asisto_PopupDialogAnimation</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="Asisto_DetailPopupDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+
+    </style>
+
+    <style name="Asisto_PopupDialogAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+    </style>
+
+    <style name="TextAppearanceFinish" parent="android:TextAppearance.Holo.Medium">
+<!--         <item name="android:textColor">#fff</item> -->
+    </style>
+
+    <style name="WizardPageContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="WizardPageTitle">
+        <item name="android:id">@android:id/title</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginLeft">16dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:paddingLeft">?android:attr/listPreferredItemPaddingLeft</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:textColor">#ff0099cc</item>
+    </style>
+
+    <style name="WizardFormLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+    </style>
+
+
+</resources>

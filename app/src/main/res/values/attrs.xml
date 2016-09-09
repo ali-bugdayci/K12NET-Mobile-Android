@@ -1,0 +1,31 @@
+<resources>
+    <declare-styleable name="AsistoFlowLayout">
+        <attr name="horizontalSpacing" format="dimension"/>
+        <attr name="verticalSpacing" format="dimension"/>
+        <attr name="orientation" format="enum">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+        <attr name="fillLines" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="exceptLast" value="1"/>
+            <enum name="all" value="2"/>
+        </attr>
+        <attr name="debugDraw" format="boolean"/>
+        <attr name="weightSum" format="float" />
+        <attr name="weightDefault" format="float" />
+        <attr name="centerJustified" format="boolean" />
+        <attr name="android:gravity"/>
+    </declare-styleable>
+    <declare-styleable name="FlowLayout_LayoutParams">
+        <attr name="layout_newLine" format="boolean"/>
+        <attr name="layout_horizontalSpacing" format="dimension"/>
+        <attr name="layout_verticalSpacing" format="dimension"/>
+        <attr name="layout_weight" format="float"/>
+        <attr name="layout_centerJustified" format="boolean" />
+        <attr name="android:layout_gravity"/>
+    </declare-styleable>
+    <declare-styleable name="AsistoScrollView">
+        <attr name="layout_maxHeight" format="dimension"/>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <View
+            android:id="@+id/img_item1"
+            android:layout_width="8dp"
+            android:layout_height="8dp" />
+
+        <com.atlas.k12net.component.AsistoTextView
+            android:id="@+id/txt_item_title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="AsistoTextView"
+            android:textAppearance="@style/Asisto_TinyLabel" />
+
+<!--         <ImageView -->
+<!--             android:id="@+id/img_item2" -->
+<!--             android:layout_width="wrap_content" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_marginLeft="5dp" -->
+<!--             android:src="@drawable/white_smoke_circle_shape" /> -->
+
+<!--         <com.ytcyazilim.asisto.component.AsistoTextView -->
+<!--             android:id="@+id/txt_item_title2" -->
+<!--             android:layout_width="wrap_content" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:text="AsistoTextView" -->
+<!--             android:textAppearance="@style/Asisto_TinyLabel" /> -->
+
+        <com.atlas.k12net.component.AsistoTextView
+            android:id="@+id/txt_item_title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="34"
+            android:textAppearance="@style/Asisto_TinyLabel"
+            android:visibility="gone" />
+
+ </TableRow>

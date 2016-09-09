@@ -1,0 +1,18 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <style name="Asisto_PopupDialogTurquase" parent="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+        <item name="android:windowAnimationStyle">@style/Asisto_DetailPopupDialogAnimation</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="Asisto_PopupDialog" parent="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/Asisto_DetailPopupDialogAnimation</item>
+    </style>
+    
+    <style name="Asisto_DetailPopupDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+        
+    </style>
+
+</resources>
