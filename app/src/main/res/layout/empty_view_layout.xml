@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:id="@+id/lyt_main">
 
-    <com.atlas.k12net.component.AsistoTextView
+    <com.atlas.k12netframe.component.AsistoTextView
         android:id="@+id/txt_subtitle_title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

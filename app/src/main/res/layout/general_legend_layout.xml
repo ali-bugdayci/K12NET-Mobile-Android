@@ -10,7 +10,7 @@
             android:layout_width="8dp"
             android:layout_height="8dp" />
 
-        <com.atlas.k12net.component.AsistoTextView
+        <com.atlas.k12netframe.component.AsistoTextView
             android:id="@+id/txt_item_title1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
 <!--             android:text="AsistoTextView" -->
 <!--             android:textAppearance="@style/Asisto_TinyLabel" /> -->
 
-        <com.atlas.k12net.component.AsistoTextView
+        <com.atlas.k12netframe.component.AsistoTextView
             android:id="@+id/txt_item_title2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

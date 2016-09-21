@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">iSiS</string>
+    <string name="app_name">K12NET Frame</string>
     <string name="action_settings">Ayarlar</string>
     <string name="username">Kullanıcı Adı</string>
     <string name="password">Şifre</string>
@@ -26,7 +26,7 @@
 	<string name="blank">Boş</string>
 	<string name="student_list">Öğrenciler</string>
 	<string name="grade">Sınıf</string>
-	<string name="appName">Asisto</string>
+	<string name="appName">K12NET Frame</string>
 	<string name="unknown">Bilinmeyen</string>
 	<string name="passive">Pasif</string>
 	<string name="title">Başlık</string>

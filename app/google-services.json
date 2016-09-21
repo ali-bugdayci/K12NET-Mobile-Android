@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "86899213919",
+    "firebase_url": "https://k12net-frame-8e08a.firebaseio.com",
+    "project_id": "k12net-frame-8e08a",
+    "storage_bucket": "k12net-frame-8e08a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86899213919:android:d69b434090e22125",
+        "android_client_info": {
+          "package_name": "com.atlas.k12netframe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "86899213919-hdf18dv777esg83b2s2v05onnjinpe2u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdcztl2mt9vIHWIyeXOQmHvGYMLl-x77o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

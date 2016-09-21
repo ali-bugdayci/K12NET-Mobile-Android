@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-        android:src="@drawable/sis_bg"
+        android:src="@drawable/k12net_back"
     android:tileModeY="mirror"
+    android:tileModeX="mirror"
     android:gravity="center" >
 
 </bitmap>

@@ -16,15 +16,15 @@
 
             <ImageView
                 android:id="@+id/img_login_icon"
-                android:layout_width="128dp"
-                android:layout_height="128dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
-                android:src="@drawable/isis"
+                android:src="@drawable/k12net_logo"
                 android:cropToPadding="false"
                 android:adjustViewBounds="false" />
 
-            <com.atlas.k12net.component.AsistoTextView
+            <com.atlas.k12netframe.component.AsistoTextView
                 android:id="@+id/lbl_login_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
