@@ -250,5 +250,13 @@
         <item name="android:paddingRight">12dp</item>
     </style>
 
+    <style name="K12NET_ModalLayout"  parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:windowBackground">@drawable/modal_background_blured</item>
+    </style>
+
 
 </resources>

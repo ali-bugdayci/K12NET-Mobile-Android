@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.atlas.k12netframe.LoginActivity;
 import com.atlas.k12netframe.R;
 import com.atlas.k12netframe.WebViewerActivity;
-import com.atlas.k12netframe.gcm.GCMRegisterAsyncTask;
+import com.atlas.k12netframe.fcm.MyFirebaseInstanceIDService;
 import com.atlas.k12netframe.utils.userSelection.AsistoUserReferences;
 import com.atlas.k12netframe.utils.webConnection.AsistoHttpClient;
 
@@ -43,7 +43,7 @@ public class LoginAsyncTask extends AsistoAsyncTask {
 
     @Override
     public void onPreExecute() {
-        progress_dialog = new Dialog(ctx);
+        progress_dialog = new Dialog(ctx, R.style.K12NET_ModalLayout);
         progress_dialog.setContentView(R.layout.loading_view_layout);
         progress_dialog.show();
     }
@@ -123,8 +123,9 @@ public class LoginAsyncTask extends AsistoAsyncTask {
         if (isLogin == false) {
             Toast.makeText(ctx, R.string.login_failed, Toast.LENGTH_SHORT).show();
         } else {
-            GCMRegisterAsyncTask gcmRegister = new GCMRegisterAsyncTask(ctx);
-            gcmRegister.execute();
+
+            MyFirebaseInstanceIDService firebaseInstanceIDService = new MyFirebaseInstanceIDService();
+            firebaseInstanceIDService.onTokenRefresh();
 
             WebViewerActivity.startUrl = AsistoUserReferences.getConnectionAddress();
             Intent intent = new Intent(ctx, WebViewerActivity.class);
