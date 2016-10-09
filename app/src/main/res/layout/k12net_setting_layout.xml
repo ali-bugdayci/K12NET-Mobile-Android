@@ -18,7 +18,7 @@
             android:layout_marginTop="12dp"
             android:src="@drawable/k12net_logo" />
 
-        <com.atlas.k12netframe.component.AsistoTextView
+        <com.k12nt.k12netframe.component.AsistoTextView
             android:id="@+id/lbl_login_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
             android:gravity="center"
             android:visibility="gone">
 
-            <com.atlas.k12netframe.component.AsistoTextView
+            <com.k12nt.k12netframe.component.AsistoTextView
                 android:id="@+id/txt_language_en"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                 android:max="1"
                 android:layout_weight="0.1" />
 
-            <com.atlas.k12netframe.component.AsistoTextView
+            <com.k12nt.k12netframe.component.AsistoTextView
                 android:id="@+id/txt_language_ar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

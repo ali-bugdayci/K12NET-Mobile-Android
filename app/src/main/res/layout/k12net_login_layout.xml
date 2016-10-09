@@ -24,7 +24,7 @@
                 android:cropToPadding="false"
                 android:adjustViewBounds="false" />
 
-            <com.atlas.k12netframe.component.AsistoTextView
+            <com.k12nt.k12netframe.component.AsistoTextView
                 android:id="@+id/lbl_login_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

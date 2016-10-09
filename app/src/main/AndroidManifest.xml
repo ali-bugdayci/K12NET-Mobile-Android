@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.atlas.k12netframe" >
+    package="com.k12nt.k12netframe" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -16,7 +16,7 @@
 
         <activity
             android:launchMode="singleTop"
-            android:name="com.atlas.k12netframe.LoginActivity" android:configChanges="locale">
+            android:name="com.k12nt.k12netframe.LoginActivity" android:configChanges="locale">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,7 +25,7 @@
 
         <!-- [START firebase_service] -->
         <service
-            android:name="fcm.MyFirebaseMessagingService">
+            android:name="com.k12nt.k12netframe.fcm.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
@@ -33,7 +33,7 @@
         <!-- [END firebase_service] -->
         <!-- [START firebase_iid_service] -->
         <service
-            android:name="fcm.MyFirebaseInstanceIDService">
+            android:name="com.k12nt.k12netframe.fcm.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
@@ -41,7 +41,7 @@
         <!-- [END firebase_iid_service] -->
 
         <activity
-            android:name="com.atlas.k12netframe.WebViewerActivity" android:configChanges="locale">
+            android:name="com.k12nt.k12netframe.WebViewerActivity" android:configChanges="locale">
         </activity>
 
     </application>

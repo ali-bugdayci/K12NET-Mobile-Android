@@ -5,11 +5,11 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.atlas.k12netframe"
+        applicationId "com.k12nt.k12netframe"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 1
-        versionName "0.0.1"
+        versionCode 5
+        versionName "1.4"
     }
     buildTypes {
         release {
@@ -24,6 +24,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:22.2.0"
     compile 'com.google.firebase:firebase-messaging:9.4.0'
     compile 'com.google.firebase:firebase-core:9.4.0'
+    compile 'me.leolin:ShortcutBadger:1.1.6@aar'
 }
 
 // ADD THIS AT THE BOTTOM
