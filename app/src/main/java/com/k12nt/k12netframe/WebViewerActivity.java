@@ -1,6 +1,8 @@
 package com.k12nt.k12netframe;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -68,6 +70,17 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                 if (url.toLowerCase().contains("logout.aspx")) {
                     finish();
                 }
+            }
+
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.contains("tel:")) {
+                    if (url.startsWith("tel:")) {
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    }
+                }
+                return false;
             }
 
         });
