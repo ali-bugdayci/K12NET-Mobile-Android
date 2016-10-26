@@ -33,7 +33,8 @@
                 android:text="@string/welcome"
                 android:textAppearance="@style/Asisto_BigLabelWhite"
                 android:textSize="36sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="#2d76a1" />
 
             <EditText
                 android:id="@+id/txt_login_username"
@@ -63,7 +64,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:textAppearance="@style/Asisto_ButtonLabel"
-                    android:textColor="#ffffff"
+                    android:textColor="#2d76a1"
                     android:checked="false" />
 
                 <Button

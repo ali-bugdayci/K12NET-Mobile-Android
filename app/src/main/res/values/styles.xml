@@ -28,7 +28,7 @@
         <item name="android:layout_width">250dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textAppearance">@style/Asisto_ButtonLabel</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">#2d76a1</item>
     </style>
 
     <style name="Asisto_SmallButton">
@@ -65,7 +65,7 @@
 
     <style name="Asisto_ButtonLabel">
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">#2d76a1</item>
         <item name="android:gravity">center_horizontal</item>
     </style>
 
