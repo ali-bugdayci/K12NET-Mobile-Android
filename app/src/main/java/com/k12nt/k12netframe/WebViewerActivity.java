@@ -1,17 +1,25 @@
 package com.k12nt.k12netframe;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
 
 import com.k12nt.k12netframe.async_tasks.K12NetAsyncCompleteListener;
 import com.k12nt.k12netframe.async_tasks.AsistoAsyncTask;
@@ -139,6 +147,26 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setBuiltInZoomControls(true);
         webview.getSettings().setDisplayZoomControls(false);
+        webview.getSettings().setAllowFileAccess(true);
+        webview.getSettings().setLoadWithOverviewMode(true);
+        webview.getSettings().setUseWideViewPort(true);
+        webview.setDownloadListener(new DownloadListener() {
+                                   @Override
+                                   public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength){
+                                       DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+                                       request.setDescription("Download file...");
+                                       request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype));
+                                       request.allowScanningByMediaScanner();
+                                       request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+                                       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype));
+                                       DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                       dm.enqueue(request);
+                                       Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
+                                   }
+                               });
+
+
         webview.loadUrl(startUrl);
 		mainLayout.removeAllViews();
 		mainLayout.addView(webview);
@@ -182,4 +210,9 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             finish();
         }
     }
+
+
+
+
+
 }
