@@ -24,6 +24,7 @@ public class K12NetUserReferences {
 	private static final String LIGHT_OPTION = "lightOption";
     private static final String CALENDAR_PROVIDER_ID = "calendarProviderId";
     private static final String BADGENUMBER = "badgeNumber";
+
 	private static K12NetUserReferences references = null;
 
 	private SharedPreferences settings;
@@ -49,7 +50,7 @@ public class K12NetUserReferences {
         appVersionNo = settings.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         calendarProviderId = settings.getInt(CALENDAR_PROVIDER_ID, 1);
         badgeNumber = settings.getInt(BADGENUMBER, 0);
-        languageCode = settings.getString(LANGAUGE, "en");
+        languageCode = settings.getString(LANGAUGE, null);
 	}
 
 	public static void initUserReferences(Context context) {

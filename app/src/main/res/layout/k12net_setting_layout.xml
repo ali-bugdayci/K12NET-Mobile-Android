@@ -47,34 +47,41 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:weightSum="1"
             android:gravity="center"
-            android:visibility="gone">
+            android:visibility="visible">
 
-            <com.k12nt.k12netframe.component.AsistoTextView
-                android:id="@+id/txt_language_en"
+            <ToggleButton
+                style="@style/Asisto_SmallButton"
+                android:id="@+id/btn_tr"
+                android:gravity="center"
+                android:text="@string/turkish"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textOff="@string/turkish"
+                android:textOn="@string/turkish" />
+
+            <ToggleButton
+                style="@style/Asisto_SmallButton"
+                android:id="@+id/btn_en"
+                android:gravity="center"
                 android:text="@string/english"
-                android:textAppearance="@style/Asisto_MediumLabel"
-                android:layout_centerInParent="true" />
-
-            <SeekBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/seekBar_language"
-                android:progress="1"
-                android:max="1"
-                android:layout_weight="0.1" />
+                android:textOff="@string/english"
+                android:textOn="@string/english" />
 
-            <com.k12nt.k12netframe.component.AsistoTextView
-                android:id="@+id/txt_language_ar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ToggleButton
+                style="@style/Asisto_SmallButton"
+                android:id="@+id/btn_ar"
+                android:gravity="center"
                 android:text="@string/arabic"
-                android:textAppearance="@style/Asisto_MediumLabel"
-                android:layout_centerInParent="true" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/arabic"
+                android:textOn="@string/arabic"
+                android:checked="false" />
 
         </LinearLayout>
 
@@ -83,7 +90,7 @@
             style="@style/Asisto_Button"
             android:gravity="center"
             android:text="@string/save"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="15dp" />
 
     </LinearLayout>
 

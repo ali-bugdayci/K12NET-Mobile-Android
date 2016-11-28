@@ -228,5 +228,6 @@
     <string name="remarkRubricSelection">Lütfen görmek istediğiniz rapor türünü seçiniz?</string>
     <string name="english">English</string>
     <string name="arabic">العربية</string>
+    <string name="turkish">Türkçe</string>
 
 </resources>

@@ -32,6 +32,11 @@ public class LoginActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         K12NetUserReferences.initUserReferences(getApplicationContext());
+
+        if(K12NetUserReferences.getLanguageCode() == null){
+            K12NetUserReferences.setLanguage(this.getString(R.string.localString));
+        }
+
         K12NetHttpClient.resetBrowser(getApplicationContext());
 
         //String lang = K12NetUserReferences.getLanguageCode();

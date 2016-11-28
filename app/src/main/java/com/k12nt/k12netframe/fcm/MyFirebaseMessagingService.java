@@ -56,13 +56,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             msg = remoteMessage.getData().get("message");
-            String webPart = remoteMessage.getData().get("part");
+       /*   String webPart = remoteMessage.getData().get("part");
             String message_en = remoteMessage.getData().get("message_en");
             String message_tr = remoteMessage.getData().get("message_tr");
+
             msg = message_en;
             if(Locale.getDefault().getLanguage() == "tr"){
                 msg = message_tr;
-            }
+            }*/
 
         }
 
@@ -95,8 +96,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.k12net_appicon)
-                .setContentTitle("K12Net Frame")
+                .setSmallIcon(R.drawable.k12net_logo)
+                .setContentTitle(this.getString(R.string.app_name))
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)

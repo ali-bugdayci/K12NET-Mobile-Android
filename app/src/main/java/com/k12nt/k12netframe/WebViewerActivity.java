@@ -1,13 +1,17 @@
 package com.k12nt.k12netframe;
 
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +19,8 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
@@ -28,6 +34,7 @@ import com.k12nt.k12netframe.utils.webConnection.K12NetHttpClient;
 
 import org.apache.http.cookie.Cookie;
 
+import java.io.File;
 import java.util.List;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -37,6 +44,50 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 	public static String startUrl = "";
     public static Context ctx = null;
     WebView webview = null;
+
+    private ValueCallback<Uri> mUploadMessage;
+    private final static int FILECHOOSER_RESULTCODE=1;
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent intent) {
+        if(requestCode==FILECHOOSER_RESULTCODE)
+        {
+            if (null == mUploadMessage) return;
+            Uri result = intent == null || resultCode != RESULT_OK ? null
+                    : intent.getData();
+
+            String wholeID = DocumentsContract.getDocumentId(result);
+
+// Split at colon, use second item in the array
+            String id = wholeID.split(":")[1];
+
+            String[] column = { MediaStore.Images.Media.DATA };
+
+// where id is equal to
+            String sel = MediaStore.Images.Media._ID + "=?";
+
+            Cursor cursor = getContentResolver().
+                    query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            column, sel, new String[]{ id }, null);
+
+            String filePath = "";
+
+            int columnIndex = cursor.getColumnIndex(column[0]);
+
+            if (cursor.moveToFirst()) {
+                filePath = cursor.getString(columnIndex);
+            }
+
+            File file = new File(filePath);
+
+            Uri uri = Uri.fromFile(file);
+
+            mUploadMessage.onReceiveValue(uri);
+            mUploadMessage = null;
+        }
+    }
 
     @Override
 	protected AsistoAsyncTask getAsyncTask() {
@@ -78,6 +129,7 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                 if (url.toLowerCase().contains("logout.aspx")) {
                     finish();
                 }
+                startUrl = url;
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -89,6 +141,44 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                     }
                 }
                 return false;
+            }
+
+        });
+
+        webview.setWebChromeClient(new WebChromeClient()
+        {
+            //The undocumented magic method override
+            //Eclipse will swear at you if you try to put @Override here
+            // For Android 3.0+
+            public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                WebViewerActivity.this.startActivityForResult(Intent.createChooser(i,"File Chooser"), FILECHOOSER_RESULTCODE);
+
+            }
+
+            // For Android 3.0+
+            public void openFileChooser( ValueCallback uploadMsg, String acceptType ) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                WebViewerActivity.this.startActivityForResult(
+                        Intent.createChooser(i, "File Browser"),
+                        FILECHOOSER_RESULTCODE);
+            }
+
+            //For Android 4.1
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                WebViewerActivity.this.startActivityForResult( Intent.createChooser( i, "File Chooser" ), WebViewerActivity.FILECHOOSER_RESULTCODE );
+
             }
 
         });
@@ -109,10 +199,10 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
             Log.d("LNG",webview.getContext().getString(R.string.localString) );
 
-            String cookieString = "UICulture" + "=" + webview.getContext().getString(R.string.localString) + "; domain=" + sessionInfo.getDomain();
+            String cookieString = "UICulture" + "=" + K12NetUserReferences.getLanguageCode() + "; domain=" + sessionInfo.getDomain();
             cookieManager.setCookie(K12NetUserReferences.getConnectionAddress(), cookieString);
 
-            cookieString = "Culture" + "=" + webview.getContext().getString(R.string.localString) + "; domain=" + sessionInfo.getDomain();
+            cookieString = "Culture" + "=" + K12NetUserReferences.getLanguageCode() + "; domain=" + sessionInfo.getDomain();
             cookieManager.setCookie(K12NetUserReferences.getConnectionAddress(), cookieString);
         }
 

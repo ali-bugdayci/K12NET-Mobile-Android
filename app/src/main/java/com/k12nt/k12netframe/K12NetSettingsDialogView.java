@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.ToggleButton;
 
 import com.k12nt.k12netframe.utils.userSelection.K12NetUserReferences;
 
@@ -13,12 +14,16 @@ import java.util.Locale;
 
 public class K12NetSettingsDialogView extends K12NetDailogView {
 
+    public static String TURKISH = "tr";
+    public static String ENGLISH = "en";
+    public static String ARABIC = "ar";
+
+
 	public K12NetSettingsDialogView(Context context) {
 		super(context);
 	}
 
-    public static final String ENGLISH = "en";
-    public static final String ARABIC = "ar";
+    ToggleButton[] language_btn_list = new ToggleButton[3];
 	
 	protected int getToolbarIcon() {
 		return R.drawable.k12net_logo;
@@ -52,45 +57,61 @@ public class K12NetSettingsDialogView extends K12NetDailogView {
             }
         });
 
-        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBar_language);
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        ToggleButton btn_tr = (ToggleButton) view.findViewById(R.id.btn_tr);
+        ToggleButton btn_en = (ToggleButton) view.findViewById(R.id.btn_en);
+        ToggleButton btn_ar = (ToggleButton) view.findViewById(R.id.btn_ar);
 
-                if(i == 0) {
-                    K12NetUserReferences.setLanguage(ENGLISH);
-                }
-                else
-                {
-                    K12NetUserReferences.setLanguage(ARABIC);
-                }
+        language_btn_list[0] = btn_tr;
+        language_btn_list[1] = btn_en;
+        language_btn_list[2] = btn_ar;
 
-                changeLanguage();
-            }
+        btn_tr.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
+            public void onClick(View arg0) {
+                updateLanguage(0, TURKISH);
             }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-
         });
 
-        if(K12NetUserReferences.getLanguageCode() == ENGLISH) {
-            seekBar.setProgress(0);
+        btn_en.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                updateLanguage(1, ENGLISH);
+            }
+        });
+
+        btn_ar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                updateLanguage(2, ARABIC);
+            }
+        });
+
+        if(K12NetUserReferences.getLanguageCode().equals(TURKISH))  {
+            updateLanguage(0, TURKISH);
         }
-        else {
-            seekBar.setProgress(1);
+        else if(K12NetUserReferences.getLanguageCode().equals(ENGLISH)) {
+            updateLanguage(1, ENGLISH);
         }
-		
+        else if(K12NetUserReferences.getLanguageCode().equals(ARABIC)) {
+            updateLanguage(2, ARABIC);
+        }
+
 		return view;
 		
 	}
+
+    private void updateLanguage(int languageIndex, String languageCode) {
+        K12NetUserReferences.setLanguage(languageCode);
+
+        for(int i = 0; i < language_btn_list.length;i++) {
+            language_btn_list[i].setChecked(i == languageIndex);
+        }
+
+    }
 
     public void changeLanguage(){
 
