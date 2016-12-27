@@ -1,5 +1,6 @@
 package com.k12nt.k12netframe;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
@@ -47,6 +49,7 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
     WebView webview = null;
 
     private ValueCallback<Uri> mUploadMessage;
+    private ValueCallback<Uri[]> mFileUploadCallbackSecond;
     private final static int FILECHOOSER_RESULTCODE=1;
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -183,6 +186,13 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
             }
 
+            // file upload callback (Android 5.0 (API level 21) -- current) (public method)
+            @SuppressWarnings("all")
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                openFileInput(null, filePathCallback);
+                return true;
+            }
+
         });
 
         List<Cookie> cookies = K12NetHttpClient.getCookieList();
@@ -261,6 +271,8 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                                    }
                                });
 
+        // Enable Caching
+        enableHTML5AppCache(webview);
 
         webview.loadUrl(startUrl);
 		mainLayout.removeAllViews();
@@ -270,7 +282,44 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 		
 	}
 
-	@Override
+    @SuppressLint("NewApi")
+    protected void openFileInput(final ValueCallback<Uri> fileUploadCallbackFirst, final ValueCallback<Uri[]> fileUploadCallbackSecond) {
+        if (mUploadMessage != null) {
+            mUploadMessage.onReceiveValue(null);
+        }
+        mUploadMessage = fileUploadCallbackFirst;
+
+        if (mFileUploadCallbackSecond != null) {
+            mFileUploadCallbackSecond.onReceiveValue(null);
+        }
+        mFileUploadCallbackSecond = fileUploadCallbackSecond;
+
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+//        i.setType(mUploadableImageFileTypes);
+
+        startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    }
+
+    private void enableHTML5AppCache(WebView webView) {
+
+        webView.getSettings().setDomStorageEnabled(true);
+
+        // Set cache size to 8 mb by default. should be more than enough
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            webView.getSettings().setAppCacheMaxSize(1024 * 1024 * 8);
+        }
+
+        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath());
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAppCacheEnabled(true);
+
+        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+    }
+
+
+
+    @Override
 	public void buildCustomView() {
 
         LinearLayout back_button = (LinearLayout) findViewById(R.id.lyt_back);
