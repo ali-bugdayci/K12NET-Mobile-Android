@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.k12nt.k12netframe.async_tasks.K12NetAsyncCompleteListener;
 import com.k12nt.k12netframe.async_tasks.AsistoAsyncTask;
+import com.k12nt.k12netframe.utils.definition.K12NetStaticDefinition;
 import com.k12nt.k12netframe.utils.userSelection.K12NetUserReferences;
 import com.k12nt.k12netframe.utils.webConnection.K12NetHttpClient;
 
@@ -203,6 +204,9 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             cookieManager.setCookie(K12NetUserReferences.getConnectionAddress(), cookieString);
 
             cookieString = "Culture" + "=" + K12NetUserReferences.getLanguageCode() + "; domain=" + sessionInfo.getDomain();
+            cookieManager.setCookie(K12NetUserReferences.getConnectionAddress(), cookieString);
+
+            cookieString = "AppID" + "=" + K12NetStaticDefinition.ASISTO_ANDROID_APPLICATION_ID + "; domain=" + sessionInfo.getDomain();
             cookieManager.setCookie(K12NetUserReferences.getConnectionAddress(), cookieString);
         }
 
