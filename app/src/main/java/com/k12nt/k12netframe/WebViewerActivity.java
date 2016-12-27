@@ -55,10 +55,11 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                                     Intent intent) {
         if(requestCode==FILECHOOSER_RESULTCODE)
         {
-            if (null == mUploadMessage) return;
+            if (null == mUploadMessage ) return;
             Uri result = intent == null || resultCode != RESULT_OK ? null
                     : intent.getData();
 
+            if (null == result ) return;
             String wholeID = DocumentsContract.getDocumentId(result);
 
 // Split at colon, use second item in the array
