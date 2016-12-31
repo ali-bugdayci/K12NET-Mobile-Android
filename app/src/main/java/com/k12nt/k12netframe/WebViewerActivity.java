@@ -2,6 +2,7 @@ package com.k12nt.k12netframe;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -49,24 +51,88 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
     WebView webview = null;
 
     private ValueCallback<Uri> mUploadMessage;
-    private ValueCallback<Uri[]> mFileUploadCallbackSecond;
+    private ValueCallback<Uri[]> mFilePathCallback;
     private final static int FILECHOOSER_RESULTCODE=1;
+    private static final int INPUT_FILE_REQUEST_CODE = 1;
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private String mCameraPhotoPath;
+
+    private Uri mCapturedImageURI = null;
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode != INPUT_FILE_REQUEST_CODE || mFilePathCallback == null) {
+                super.onActivityResult(requestCode, resultCode, data);
+                return;
+            }
+            Uri[] results = null;
+            // Check that the response is a good one
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null) {
+                    String dataString = data.getDataString();
+                    if (dataString != null) {
+                        results = new Uri[]{Uri.parse(dataString)};
+                    }
+                }
+            }
+            mFilePathCallback.onReceiveValue(results);
+            mFilePathCallback = null;
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            if (requestCode != FILECHOOSER_RESULTCODE || mUploadMessage == null) {
+                super.onActivityResult(requestCode, resultCode, data);
+                return;
+            }
+            if (requestCode == FILECHOOSER_RESULTCODE) {
+                if (null == this.mUploadMessage) {
+                    return;
+                }
+                Uri result = null;
+                try {
+                    if (resultCode != RESULT_OK) {
+                        result = null;
+                    } else {
+                        // retrieve from the private variable if the intent is null
+                        result = data == null ? mCapturedImageURI : data.getData();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "activity :" + e,
+                            Toast.LENGTH_LONG).show();
+                }
+                mUploadMessage.onReceiveValue(result);
+                mUploadMessage = null;
+            }
+        }
+        return;
+    }
+
+
+    //@Override
+    protected void onActivityResulty(int requestCode, int resultCode,
                                     Intent intent) {
+
+        super.onActivityResult(requestCode, resultCode, intent);
+
         if(requestCode==FILECHOOSER_RESULTCODE)
         {
-            if (null == mUploadMessage ) return;
-            Uri result = intent == null || resultCode != RESULT_OK ? null
-                    : intent.getData();
+            Uri _uri = null;
 
-            if (null == result ) return;
-            String wholeID = DocumentsContract.getDocumentId(result);
+            String resultStr = intent == null || resultCode != RESULT_OK ? null
+                    : intent.getDataString();
 
+            /*if(!resultStr.isEmpty()) {
+                _uri = Uri.parse(resultStr);
+            }
+
+            if (null == _uri ) return;
+           // String wholeID = DocumentsContract.getDocumentId(_uri);
+
+       //     Log.d("","wholeID = "+ wholeID);
+*/
 // Split at colon, use second item in the array
-            String id = wholeID.split(":")[1];
+         //   String id = wholeID.split(":")[1];
+
+            String id = resultStr.substring(resultStr.lastIndexOf("%3A")+3);
 
             String[] column = { MediaStore.Images.Media.DATA };
 
@@ -89,8 +155,39 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
             Uri uri = Uri.fromFile(file);
 
-            mUploadMessage.onReceiveValue(uri);
-            mUploadMessage = null;
+            if(mUploadMessage != null) {
+                mUploadMessage.onReceiveValue(uri);
+                mUploadMessage = null;
+            }
+        /*    else if(mFileUploadCallbackSecond != null){
+            //    mFileUploadCallbackSecond.onReceiveValue(new Uri[]{uri});
+                mFileUploadCallbackSecond = null;
+            }
+*/
+         /*   Log.d("","Chosen content = "+ resultStr);
+
+            String filePath = null;
+           // Uri _uri = result;
+            Log.d("","URI = "+ _uri);
+            if (_uri != null && "content".equals(_uri.getScheme())) {
+                Cursor cursor = this.getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+                cursor.moveToFirst();
+                filePath = cursor.getString(0);
+                cursor.close();
+            } else {
+                filePath = _uri.getPath();
+            }
+            Log.d("","Chosen path = "+ filePath);
+
+            File file = new File(filePath);
+
+            Uri uri = Uri.fromFile(file);
+
+            Uri[] results = null;
+            results = new Uri[]{Uri.parse(resultStr)};
+            mFileUploadCallbackSecond.onReceiveValue(results);
+            mFileUploadCallbackSecond = null;*/
+
         }
     }
 
@@ -189,8 +286,19 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             // file upload callback (Android 5.0 (API level 21) -- current) (public method)
             @SuppressWarnings("all")
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                openFileInput(null, filePathCallback);
-                return true;
+               // openFileInput(null, filePathCallback);
+
+                if (mFilePathCallback != null) {
+                    mFilePathCallback.onReceiveValue(null);
+                }
+                mFilePathCallback = filePathCallback;
+
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                WebViewerActivity.this.startActivityForResult( Intent.createChooser( i, "File Chooser" ), WebViewerActivity.FILECHOOSER_RESULTCODE );
+
+                return super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
             }
 
         });
@@ -272,7 +380,7 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                                });
 
         // Enable Caching
-        enableHTML5AppCache(webview);
+       // enableHTML5AppCache(webview);
 
         webview.loadUrl(startUrl);
 		mainLayout.removeAllViews();
@@ -289,16 +397,57 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         }
         mUploadMessage = fileUploadCallbackFirst;
 
-        if (mFileUploadCallbackSecond != null) {
-            mFileUploadCallbackSecond.onReceiveValue(null);
+        if (mFilePathCallback != null) {
+            mFilePathCallback.onReceiveValue(null);
         }
-        mFileUploadCallbackSecond = fileUploadCallbackSecond;
+        mFilePathCallback = fileUploadCallbackSecond;
 
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.addCategory(Intent.CATEGORY_OPENABLE);
+     //   Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+     //   i.addCategory(Intent.CATEGORY_OPENABLE);
 //        i.setType(mUploadableImageFileTypes);
 
-        startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    //    startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+
+        // Camera capture image intent
+
+   /*     File imageStorageDir = new File(
+                Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES)
+                , "AndroidExampleFolder");
+
+        if (!imageStorageDir.exists()) {
+            // Create AndroidExampleFolder at sdcard
+            imageStorageDir.mkdirs();
+        }
+
+        // Create camera captured image file path and name
+        File file = new File(
+                imageStorageDir + File.separator + "IMG_"
+                        + String.valueOf(System.currentTimeMillis())
+                        + ".jpg");
+
+        mCapturedImageURI = Uri.fromFile(file);
+
+        final Intent captureIntent = new Intent(
+                android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+        captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
+*/
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        //i.setType("image/*");
+        i.setType("*/*");
+
+    /*    // Create file chooser intent
+        Intent chooserIntent = Intent.createChooser(i, "Image Chooser");
+
+        // Set camera intent to file chooser
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS
+                , new Parcelable[] { captureIntent });
+*/
+        // On select image call onActivityResult method of activity
+        startActivityForResult(i, FILECHOOSER_RESULTCODE);
+
     }
 
     private void enableHTML5AppCache(WebView webView) {
