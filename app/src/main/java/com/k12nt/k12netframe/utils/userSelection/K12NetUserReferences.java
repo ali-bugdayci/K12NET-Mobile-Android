@@ -54,8 +54,10 @@ public class K12NetUserReferences {
 	}
 
 	public static void initUserReferences(Context context) {
-		references = new K12NetUserReferences(context);
-	}
+        if(references == null){
+	    	references = new K12NetUserReferences(context);
+	    }
+    }
 
     public static String getAsistoRegisterId() {
         return references.appRegisterId;
