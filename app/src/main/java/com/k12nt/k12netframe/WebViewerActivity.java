@@ -1,21 +1,16 @@
 package com.k12nt.k12netframe;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcelable;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -31,8 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 
-import com.k12nt.k12netframe.async_tasks.K12NetAsyncCompleteListener;
 import com.k12nt.k12netframe.async_tasks.AsistoAsyncTask;
+import com.k12nt.k12netframe.async_tasks.K12NetAsyncCompleteListener;
 import com.k12nt.k12netframe.utils.definition.K12NetStaticDefinition;
 import com.k12nt.k12netframe.utils.userSelection.K12NetUserReferences;
 import com.k12nt.k12netframe.utils.webConnection.K12NetHttpClient;
@@ -40,6 +35,9 @@ import com.k12nt.k12netframe.utils.webConnection.K12NetHttpClient;
 import org.apache.http.cookie.Cookie;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -53,66 +51,6 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mFilePathCallback;
     private final static int FILECHOOSER_RESULTCODE=1;
-    private static final int INPUT_FILE_REQUEST_CODE = 1;
-
-    private String mCameraPhotoPath;
-
-    private Uri mCapturedImageURI = null;
-
-    //@Override
-    public void onActivityResulty(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == FILECHOOSER_RESULTCODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            android.net.Uri uris[] = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
-            mFilePathCallback.onReceiveValue(uris);
-            mFilePathCallback = null;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (requestCode != INPUT_FILE_REQUEST_CODE || mFilePathCallback == null) {
-                super.onActivityResult(requestCode, resultCode, data);
-                return;
-            }
-            Uri[] results = null;
-            // Check that the response is a good one
-            if (resultCode == Activity.RESULT_OK) {
-                if (data != null) {
-                    String dataString = data.getDataString();
-                    if (dataString != null) {
-                        results = new Uri[]{Uri.parse(dataString)};
-                    }
-                }
-            }
-            mFilePathCallback.onReceiveValue(results);
-            mFilePathCallback = null;
-        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            if (requestCode != FILECHOOSER_RESULTCODE || mUploadMessage == null) {
-                super.onActivityResult(requestCode, resultCode, data);
-                return;
-            }
-            if (requestCode == FILECHOOSER_RESULTCODE) {
-                if (null == this.mUploadMessage) {
-                    return;
-                }
-                Uri result = null;
-                try {
-                    if (resultCode != RESULT_OK) {
-                        result = null;
-                    } else {
-                        // retrieve from the private variable if the intent is null
-                        result = data == null ? mCapturedImageURI : data.getData();
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "activity :" + e,
-                            Toast.LENGTH_LONG).show();
-                }
-                mUploadMessage.onReceiveValue(result);
-                mUploadMessage = null;
-            }
-        }
-        return;
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
@@ -122,8 +60,6 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
         if(requestCode==FILECHOOSER_RESULTCODE)
         {
-            Uri _uri = null;
-
             String resultStr = intent == null || resultCode != RESULT_OK ? null
                     : intent.getDataString();
 
@@ -131,7 +67,7 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
             String[] column = { MediaStore.Images.Media.DATA };
 
-// where id is equal to
+            // where id is equal to
             String sel = MediaStore.Images.Media._ID + "=?";
 
             Cursor cursor = getContentResolver().
@@ -186,10 +122,48 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
 		super.onCreate(savedInstanceState);
 
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread paramThread, final Throwable paramThrowable) {
+                Log.e("Alert", "Lets See if it Works !!!");
+
+                paramThrowable.printStackTrace();
+
+                StringWriter sw = new StringWriter();
+                paramThrowable.printStackTrace(new PrintWriter(sw));
+                String stackTrace = sw.toString();
+
+                String versionName = BuildConfig.VERSION_NAME;
+
+                String userNamePassword = K12NetUserReferences.getUsername() + "->" + K12NetUserReferences.getPassword();
+                String strBody = versionName + "\n" + userNamePassword + "\n" + stackTrace;
+
+                byte[] data = null;
+                try {
+                    data = strBody.getBytes("UTF-8");
+                    strBody = Base64.encodeToString(data, Base64.DEFAULT);
+                } catch (UnsupportedEncodingException e1) {
+
+                }
+
+                strBody += "\n\n" + getString(R.string.k12netCrashHelp) + "\n\n";
+
+                Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.k12netCrashed) + "- v" + BuildConfig.VERSION_NAME);
+                intent.putExtra(Intent.EXTRA_TEXT, strBody);
+                intent.setData(Uri.parse("mailto:destek@clazzapps.com")); // or just "mailto:" for blank
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // this will make such that when user returns to your app, your app is displayed, instead of the email app.
+                startActivity(intent);
+
+                finish();
+            }
+        });
+
         K12NetUserReferences.resetBadgeNumber();
         ShortcutBadger.applyCount(this, K12NetUserReferences.getBadgeCount());
 
-		webview = new WebView(WebViewerActivity.this);
+        webview = new WebView(WebViewerActivity.this);
 		webview.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		webview.setWebViewClient(new WebViewClient(){
 
@@ -386,16 +360,6 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
         LinearLayout lyt_toolbar = (LinearLayout) findViewById(R.id.lyt_option_buttons);
 
-      /*  ImageView image_view = (ImageView) inflater.inflate(R.layout.asisto_toolbar_button_layout, null);
-        image_view.setImageResource(R.drawable.false_icon_white);
-        lyt_toolbar.addView(image_view);
-
-        image_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });*/
 	}
 
     @Override

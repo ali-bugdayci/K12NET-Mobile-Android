@@ -229,5 +229,9 @@
     <string name="english">English</string>
     <string name="arabic">العربية</string>
     <string name="turkish">Türkçe</string>
+    <string name="k12netCrashed">K12Net durduruldu ...</string>
+    <string name="k12netCrashHelp">K12Net bir hata ile karşılaştı.\nBu sorunu çözmemizde yardımcı olur musunuz?\nYaptığınız işlem adımlarını tam olarak aşağıya yazarsanız, bu problemi daha iyi anlayabiliriz.\nLütfen üst taraftaki kod referens kısmını silmeyiniz.</string>
+    <string name="k12netCrashSendReport">K12Net bir hata ile karşılaştı.\nRapor göndererek bu sorunu çözmemizde yardımcı olur musunuz?</string>
+
 
 </resources>
