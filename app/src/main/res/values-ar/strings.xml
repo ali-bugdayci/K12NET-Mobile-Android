@@ -232,5 +232,8 @@
     <string name="k12netCrashed">K12Net has crashed ...</string>
     <string name="k12netCrashHelp">K12Net has crashed. Please help us to resolve this issue. Describe down your last actions in detail and send us a report so we can fix the problem. Please do not erase following code hints.</string>
     <string name="k12netCrashSendReport">K12Net has crashed. Please send us a problem description so we can resolve this issue.</string>
+    <string name="writeAccessAppSettings">Write External Storage permission allows us to do store images. Please allow this permission in App Settings.</string>
+    <string name="readAccessAppSettings">Read External Storage permission allows us to read stored images. Please allow this permission in App Settings.</string>
+
 
 </resources>
