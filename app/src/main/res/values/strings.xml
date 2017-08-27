@@ -234,6 +234,7 @@
     <string name="k12netCrashSendReport">K12Net has crashed. Please send us a problem description so we can resolve this issue.</string>
     <string name="writeAccessAppSettings">Write External Storage permission allows us to do store images. Please allow this permission in App Settings.</string>
     <string name="readAccessAppSettings">Read External Storage permission allows us to read stored images. Please allow this permission in App Settings.</string>
+    <string name="locationAccessAppSettings">Getting Location permission allows us to read current position and record if you want. Please allow this permission in App Settings.</string>
 
 
 
