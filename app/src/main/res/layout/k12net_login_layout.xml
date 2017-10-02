@@ -84,5 +84,16 @@
                 android:gravity="center"
                 android:text="@string/login" />
 
+            <Button
+                style="@style/Asisto_ButtonBorderless"
+                android:id="@+id/btnResetPassword"
+                android:gravity="center"
+                android:text="@string/resetPassword"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:padding="5dp"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>

@@ -2,6 +2,7 @@ package com.k12nt.k12netframe;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -93,6 +94,18 @@ public class LoginActivity extends Activity {
                 K12NetSettingsDialogView dialogView = new K12NetSettingsDialogView(arg0.getContext());
                 dialogView.createContextView(null);
                 dialogView.show();
+            }
+        });
+
+        Button resetPassword = (Button) findViewById(R.id.btnResetPassword);
+        resetPassword.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                Intent webIntent = new Intent(arg0.getContext(), WebViewerActivity.class);
+                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                WebViewerActivity.startUrl = "https://okul.k12net.com/ResetPassword.aspx";
+                arg0.getContext().startActivity(webIntent);
             }
         });
 

@@ -83,7 +83,7 @@ public class LoginAsyncTask extends AsistoAsyncTask {
 
                 LoginActivity.providerId = jObject.optString("ProviderUserKey", "");
 
-                String cookieString = CookieManager.getInstance().getCookie(K12NetUserReferences.getConnectionAddress());
+               // String cookieString = CookieManager.getInstance().getCookie(K12NetUserReferences.getConnectionAddress());
 
                 return true;
 

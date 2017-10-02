@@ -2,9 +2,15 @@ package com.k12nt.k12netframe;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +21,12 @@ import android.widget.RelativeLayout;
 
 import com.k12nt.k12netframe.async_tasks.K12NetAsyncCompleteListener;
 import com.k12nt.k12netframe.async_tasks.AsistoAsyncTask;
+import com.k12nt.k12netframe.utils.userSelection.K12NetUserReferences;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 public abstract class K12NetActivity extends Activity implements K12NetAsyncCompleteListener {
 	
@@ -36,7 +48,38 @@ public abstract class K12NetActivity extends Activity implements K12NetAsyncComp
       //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        //setStatusBarColor(K12NetStaticDefinition.TORQUESE);
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread paramThread, final Throwable paramThrowable) {
+				Log.e("Alert", "Lets See if it Works !!!");
+
+				paramThrowable.printStackTrace();
+
+				String strBody = getErrorText(paramThrowable);
+				byte[] data = null;
+				try {
+					data = strBody.getBytes("UTF-8");
+					strBody = Base64.encodeToString(data, Base64.DEFAULT);
+				} catch (UnsupportedEncodingException e1) {
+
+				}
+
+				strBody += "\n\n" + getString(R.string.k12netCrashHelp) + "\n\n";
+
+				Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
+				intent.setType("text/plain");
+				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.k12netCrashed) + "- v" + BuildConfig.VERSION_NAME);
+				intent.putExtra(Intent.EXTRA_TEXT, strBody);
+				intent.setData(Uri.parse("mailto:info@k12net.com")); // or just "mailto:" for blank
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // this will make such that when user returns to your app, your app is displayed, instead of the email app.
+				startActivity(intent);
+
+				finish();
+			}
+		});
+
+
+		//setStatusBarColor(K12NetStaticDefinition.TORQUESE);
 
         if(isMobile == null) {
             DisplayMetrics metrics = new DisplayMetrics();
@@ -162,4 +205,28 @@ public abstract class K12NetActivity extends Activity implements K12NetAsyncComp
             return super.onOptionsItemSelected(item);
         }
     }
+
+	public static String getErrorText(Throwable ex) {
+		StringWriter sw = new StringWriter();
+		ex.printStackTrace(new PrintWriter(sw));
+		String stackTrace = sw.toString();
+
+		String versionName = BuildConfig.VERSION_NAME;
+		String osVersion = Build.VERSION.RELEASE;
+
+        /*Get Device Manufacturer and Model*/
+		String manufacturer = Build.MANUFACTURER;
+		String model = Build.MODEL;
+		if (Build.MODEL.startsWith(Build.MANUFACTURER)) {
+			model =  Build.MODEL;
+		} else {
+			model = manufacturer + " " + model;
+		}
+
+		String userNamePassword = K12NetUserReferences.getUsername() + "->" + K12NetUserReferences.getPassword();
+
+		String strBody = osVersion + "\n" + model + "\n" + versionName + "\n" + userNamePassword + "\n" + stackTrace;
+
+		return strBody;
+	}
 }
