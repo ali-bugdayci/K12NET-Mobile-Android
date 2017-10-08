@@ -88,7 +88,11 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
             if (resultStr != null) {
 
-                String id = resultStr.substring(resultStr.lastIndexOf("%3A") + 3);
+                int lastIndexOfSeperator = resultStr.lastIndexOf("%3A") + 3;
+                if(lastIndexOfSeperator < 5) {
+                    lastIndexOfSeperator = resultStr.lastIndexOf("/") + 1;
+                }
+                String id = resultStr.substring(lastIndexOfSeperator);
 
                 String[] column = {MediaStore.Images.Media.DATA};
 
