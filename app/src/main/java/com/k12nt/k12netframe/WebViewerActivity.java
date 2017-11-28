@@ -1,12 +1,10 @@
 package com.k12nt.k12netframe;
 
-import android.*;
 import android.Manifest;
 import android.app.DownloadManager;
-import android.app.Service;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,6 +12,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -51,11 +50,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
-
-import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class WebViewerActivity extends K12NetActivity implements K12NetAsyncCompleteListener {
 
@@ -76,6 +74,9 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
      */
     private GoogleApiClient client;
 
+    private Intent fileSelectorIntent = null;
+    private String contentStr = null;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent intent) {
@@ -83,45 +84,43 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == FILECHOOSER_RESULTCODE) {
-            String resultStr = intent == null || resultCode != RESULT_OK ? null
-                    : intent.getDataString();
+            String resultStr = contentStr;
+            if(intent != null) {
+                resultStr = intent == null || resultCode != RESULT_OK ? null
+                        : intent.getDataString();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "intent resetlendi", Toast.LENGTH_LONG).show();
+            }
+
+            ArrayList<Uri> uriArray = new ArrayList<>();
 
             if (resultStr != null) {
 
-                int lastIndexOfSeperator = resultStr.lastIndexOf("%3A") + 3;
-                if(lastIndexOfSeperator < 5) {
-                    lastIndexOfSeperator = resultStr.lastIndexOf("/") + 1;
-                }
-                String id = resultStr.substring(lastIndexOfSeperator);
-
-                String[] column = {MediaStore.Images.Media.DATA};
-
-                // where id is equal to
-                String sel = MediaStore.Images.Media._ID + "=?";
-
-                Cursor cursor = getContentResolver().
-                        query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                column, sel, new String[]{id}, null);
-
-                String filePath = "";
-
-                int columnIndex = cursor.getColumnIndex(column[0]);
-
-                if (cursor.moveToFirst()) {
-                    filePath = cursor.getString(columnIndex);
-                }
-
+                String filePath = getPath(this, Uri.parse(resultStr));// getFilePathFromContent(resultStr);
                 File file = new File(filePath);
+                uriArray.add(Uri.fromFile(file));
+            }
+            else if(intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
+                for(int i = 0; i < intent.getClipData().getItemCount();i++) {
+                    String filePath = getPath(this, intent.getClipData().getItemAt(i).getUri());//getFilePathFromContent(intent.getClipData().getItemAt(i).getUri().getPath());
+                   // String filePath = getFilePathFromContent(intent.getClipData().getItemAt(i).getUri().getPath());
+                    File file = new File(filePath);
+                    uriArray.add(Uri.fromFile(file));
+                }
+            }
+
+            if (uriArray.size() > 0) {
 
                 if (mUploadMessage != null) {
-                    mUploadMessage.onReceiveValue(Uri.fromFile(file));
+                    mUploadMessage.onReceiveValue(uriArray.get(0));
                     mUploadMessage = null;
                 } else if (mFilePathCallback != null) {
-                    Uri[] urilist = new Uri[]{Uri.fromFile(file)};
+                    Uri[] urilist = uriArray.toArray(new Uri[uriArray.size()]);
                     mFilePathCallback.onReceiveValue(urilist);
                     mFilePathCallback = null;
-
                 }
+
             } else {
                 if (mUploadMessage != null) {
                     mUploadMessage.onReceiveValue(null);
@@ -132,6 +131,20 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                 }
             }
         }
+        else {
+            if (mUploadMessage != null) {
+                mUploadMessage.onReceiveValue(null);
+                mUploadMessage = null;
+            } else if (mFilePathCallback != null) {
+                mFilePathCallback.onReceiveValue(null);
+                mFilePathCallback = null;
+            }
+
+            Toast.makeText(getApplicationContext(), "result code hatali", Toast.LENGTH_LONG).show();
+        }
+
+        fileSelectorIntent = null;
+        contentStr = null;
     }
 
     @Override
@@ -420,31 +433,31 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             public void openFileChooser(ValueCallback<Uri> uploadMsg) {
 
                 mUploadMessage = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("image/*");
-                WebViewerActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+                fileSelectorIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                fileSelectorIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                fileSelectorIntent.setType("image/*");
+                WebViewerActivity.this.startActivityForResult(Intent.createChooser(fileSelectorIntent, "File Chooser"), FILECHOOSER_RESULTCODE);
 
             }
 
             // For Android 3.0+
             public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
                 mUploadMessage = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
+                fileSelectorIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                fileSelectorIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                fileSelectorIntent.setType("*/*");
                 WebViewerActivity.this.startActivityForResult(
-                        Intent.createChooser(i, "File Browser"),
+                        Intent.createChooser(fileSelectorIntent, "File Browser"),
                         FILECHOOSER_RESULTCODE);
             }
 
             //For Android 4.1
             public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
                 mUploadMessage = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("image/*");
-                WebViewerActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), WebViewerActivity.FILECHOOSER_RESULTCODE);
+                fileSelectorIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                fileSelectorIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                fileSelectorIntent.setType("image/*");
+                WebViewerActivity.this.startActivityForResult(Intent.createChooser(fileSelectorIntent, "File Chooser"), WebViewerActivity.FILECHOOSER_RESULTCODE);
 
             }
 
@@ -465,10 +478,11 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                 if (hasReadAccess) {
 
                     mFilePathCallback = filePathCallback;
-                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                    i.addCategory(Intent.CATEGORY_OPENABLE);
-                    i.setType("*/*");
-                    WebViewerActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), WebViewerActivity.FILECHOOSER_RESULTCODE);
+                    fileSelectorIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    fileSelectorIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                    fileSelectorIntent.setType("*/*");
+                    fileSelectorIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    WebViewerActivity.this.startActivityForResult(Intent.createChooser(fileSelectorIntent, "File Chooser"), WebViewerActivity.FILECHOOSER_RESULTCODE);
 
                     return true;// super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
                 } else {
@@ -496,10 +510,21 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                     request.setDescription("Download file...");
-                    request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype));
+
+                    String possibleFileName = "";
+                    if(url.contains("name=")) {
+                        possibleFileName = url.substring(url.indexOf("name=")+5);
+                    }
+                    else {
+                        possibleFileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
+                    }
+                    request.setTitle(possibleFileName);
+
                     request.allowScanningByMediaScanner();
+                    request.setMimeType(mimetype);
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype));
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, possibleFileName);
+
                     DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                     dm.enqueue(request);
                     Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
@@ -699,6 +724,15 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         client.disconnect();
     }
 
+    @Override
+    public void finish() {
+
+        contentStr = fileSelectorIntent == null ? null : fileSelectorIntent.getDataString();
+
+        super.finish();
+
+    }
+
     public void restartActivity(){
         Intent mIntent = getIntent();
         finish();
@@ -728,4 +762,124 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             }
         }
     }
+
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @param selection (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
 }
