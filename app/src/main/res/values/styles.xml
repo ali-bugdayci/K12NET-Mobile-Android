@@ -5,7 +5,7 @@
 <!--     </style> -->
     
         
-    <style name="AppTheme"  parent="@android:style/Theme.Light.NoTitleBar">
+    <style name="AppTheme"  parent="@style/Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>
         <!--  <item name="android:colorPrimary">#005555</item>-->
       <!--    <item name="android:colorPrimaryDark">#04b7bb</item>-->

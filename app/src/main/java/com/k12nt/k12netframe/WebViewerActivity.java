@@ -77,6 +77,10 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
     private Intent fileSelectorIntent = null;
     private String contentStr = null;
 
+    private static final String BUSPOSITIONPAGE = "TGIJS.Web/WebParts/BusPositions".toLowerCase();
+    private boolean collectDeviceData = false;
+    private DeviceHandler deviceHandler;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent intent) {
@@ -237,28 +241,11 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         webview.setWebViewClient(new WebViewClient() {
 
             public void onPageFinished(WebView view, String url) {
-                Log.i("WEB", "Finished loading URL: " + url);
-                if (url.toLowerCase().contains("login.aspx")) {
-                    finish();
-                }
-                else if (url.toLowerCase().contains("logout.aspx")) {
-                    finish();
-                }
-                else {
-                    webview.loadUrl("javascript:( function () { var resultSrc = document.head.outerHTML; window.HTMLOUT.htmlCallback(resultSrc); } ) ()");
-                }
-                startUrl = url;
+                WebViewerActivity.this.onPageFinished(view,url);
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains("tel:")) {
-                    if (url.startsWith("tel:")) {
-                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
-                        startActivity(intent);
-                        return true;
-                    }
-                }
-                return false;
+                return WebViewerActivity.this.shouldOverrideUrlLoading(view, url);
             }
 
             //The undocumented magic method override
@@ -403,28 +390,11 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             }
 
             public void onPageFinished(WebView view, String url) {
-                Log.i("WEB", "Finished loading URL: " + url);
-                if (url.toLowerCase().contains("login.aspx")) {
-                    finish();
-                }
-                else if (url.toLowerCase().contains("logout.aspx")) {
-                    finish();
-                }
-                else {
-                    webview.loadUrl("javascript:( function () { var resultSrc = document.head.outerHTML; window.HTMLOUT.htmlCallback(resultSrc); } ) ()");
-                }
-                startUrl = url;
+                WebViewerActivity.this.onPageFinished(view,url);
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains("tel:")) {
-                    if (url.startsWith("tel:")) {
-                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
-                        startActivity(intent);
-                        return true;
-                    }
-                }
-                return false;
+                return WebViewerActivity.this.shouldOverrideUrlLoading(view, url);
             }
 
             //The undocumented magic method override
@@ -548,6 +518,84 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
+    //
+    private boolean shouldOverrideUrlLoading(WebView view, String url) {
+        if (url.contains("tel:")) {
+            if (url.startsWith("tel:")) {
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
+                startActivity(intent);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void onPageFinished(WebView view, String url) {
+        Log.i("WEB", "Finished loading URL: " + url);
+
+        String urlCheck = url.toLowerCase();
+        if (urlCheck.contains("login.aspx")) {
+            finish();
+        }
+        else if (urlCheck.contains("logout.aspx")) {
+            finish();
+        }
+        else {
+            webview.loadUrl("javascript:( function () { var resultSrc = document.head.outerHTML; window.HTMLOUT.htmlCallback(resultSrc); } ) ()");
+        }
+
+        boolean shallWeCollectData = urlCheck.contains(BUSPOSITIONPAGE);
+        if(shallWeCollectData != collectDeviceData){
+            collectDeviceData = shallWeCollectData;
+            resetDeviceCollection();
+        }
+
+        startUrl = url;
+    }
+
+    public void deviceFound(final String key) {
+        webview.post(new Runnable() {
+            @Override
+            public void run() {
+                webview.loadUrl("javascript:( function () { alert('Device found: "+ key +" ') } ) ()");
+            }
+        });
+    }
+
+
+    private void resetDeviceCollection() {
+        if(deviceHandler == null)
+            deviceHandler = new DeviceHandler(this);
+
+        if(collectDeviceData)
+            deviceHandler.startBind();
+        else
+            deviceHandler.reset();
+
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        if(collectDeviceData)
+            deviceHandler.reset();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(collectDeviceData)
+            deviceHandler.reset();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(collectDeviceData)
+            deviceHandler.startBind();
+    }
+
 
     private void enableHTML5AppCache(WebView webView) {
 
