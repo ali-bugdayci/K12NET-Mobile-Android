@@ -546,20 +546,14 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             webview.loadUrl("javascript:( function () { var resultSrc = document.head.outerHTML; window.HTMLOUT.htmlCallback(resultSrc); } ) ()");
         }
 
-        boolean shallWeCollectData = urlCheck.contains(BUSPOSITIONPAGE);
-        if(shallWeCollectData != collectDeviceData){
-            collectDeviceData = shallWeCollectData;
-            resetDeviceCollection();
-        }
-
         startUrl = url;
     }
 
-    public void deviceFound(final String key) {
+    public void devicestatusChanged(final String key, final String status){
         webview.post(new Runnable() {
             @Override
             public void run() {
-                webview.loadUrl("javascript:( function () { alert('Device found: "+ key +" ') } ) ()");
+                webview.loadUrl("javascript:( function () { var ele=document.getElementById('BtnTrigger'); if(!ele){return;} angular.element(ele).scope().ViewModel.DeviceStatusChanged('"+ key +"','" + status +"') } ) ()");
             }
         });
     }
@@ -578,13 +572,6 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
     public void onDestroy() {
         super.onDestroy();
-        if(collectDeviceData)
-            deviceHandler.reset();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
         if(collectDeviceData)
             deviceHandler.reset();
     }
@@ -808,6 +795,19 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
                 //webview.setKeepScreenOn(false);
                // getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             }
+        }
+
+
+        @JavascriptInterface
+        public void startGettingDeviceInfos() {
+            collectDeviceData = true;
+            resetDeviceCollection();
+        }
+
+        @JavascriptInterface
+        public void stopGettingDeviceInfos() {
+            collectDeviceData = false;
+            resetDeviceCollection();
         }
     }
 

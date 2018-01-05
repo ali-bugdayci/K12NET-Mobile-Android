@@ -14,7 +14,11 @@ import android.util.Log;
 
 import org.altbeacon.beacon.*;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Set;
+
+import static android.R.attr.key;
+import static com.k12nt.k12netframe.R.string.status;
 
 /**
  * Created by ali-bugdayci on 11.12.2017.
@@ -23,13 +27,30 @@ import java.util.HashSet;
 public class DeviceHandler implements BeaconConsumer {
 
     private static final String TAG = "DeviceHandler";
+    private static final double DISTANCE_TRESHOLD = 5; //meters
+    private static long waitBeforeInform = 60000; //1 min in ms
+    private static long waitBeforeAlarm = 720000; //2 hour in ms
+
     WebViewerActivity mainActivity;
     private BeaconManager deviceManager;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 11;
     private static final int REQUEST_ENABLE_BT = 12;
 
-    HashSet<String> devicesFound;
+    class DeviceData {
+        public long firstFound;
+        public long lastFound;
+        public boolean informedFound;
+        public boolean informedMissing;
+        public boolean informedAlarmed;
+
+        DeviceData(long firstFound){
+            this.firstFound = firstFound;
+            this.lastFound = firstFound;
+        }
+    }
+
+    HashMap<String,DeviceData> devicesFound;
 
     DeviceHandler(WebViewerActivity belonging){
         mainActivity = belonging;
@@ -38,11 +59,14 @@ public class DeviceHandler implements BeaconConsumer {
         handleBluetooth();
         initDevices();
 
-        devicesFound = new HashSet<>();
+        devicesFound = new HashMap<>();
     }
 
     void startBind(){
-        deviceManager.bind(this);
+        if(!deviceManager.isBound(this)) {
+            deviceManager.bind(this);
+            devicesFound = new HashMap<>();
+        }
     }
 
 
@@ -58,25 +82,77 @@ public class DeviceHandler implements BeaconConsumer {
         deviceManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
         //deviceManager.setAndroidLScanningDisabled(true);
-        deviceManager.setBackgroundMode(false);
+        //deviceManager.setBackgroundMode(false);
+
+        // set the duration of the scan to be 5 seconds
+        deviceManager.setBackgroundScanPeriod(5000l);
 
         deviceManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> devices, Region region) {
+                long now = System.currentTimeMillis();
 
                 for (Beacon device : devices) {
-                    String log = "The devices I see is:" +device.getBeaconTypeCode()  + " : "+  device.getBluetoothName()+ " about "+device.getDistance()+" meters away.";
+                    if(device.getDistance() > DISTANCE_TRESHOLD)
+                        continue;
+
                     String major = device.getId2().toString();
                     String minor = device.getId3().toString();
                     String key = major+ "-"+ minor;
 
+                    /*
+                    String log = "The devices I see is:" +device.getBeaconTypeCode()  + " : "+  device.getBluetoothName()+ " about "+device.getDistance()+" meters away.";
                     log += " Major minor: " + key ;
-
                     Log.e(TAG, log);
+                    */
 
-                    if(!devicesFound.contains(key)){
-                        devicesFound.add(key);
-                        mainActivity.deviceFound(key);
+                    DeviceData data;
+
+                    if(!devicesFound.containsKey(key)){
+                        data = new DeviceData(now);
+                    }else
+                    {
+                        data = devicesFound.get(key);
+                        data.lastFound = now;
+                    }
+
+                    Log.e(TAG, key + " distance: " + device.getDistance() + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
+                    devicesFound.put(key,data);
+                }
+
+                Set<String> ids = devicesFound.keySet();
+
+                for (String id : ids) {
+                    DeviceData data = devicesFound.get(id);
+                    if(data.informedFound)
+                    {
+                        if(data.informedMissing)
+                            continue;
+
+                        if(data.lastFound + waitBeforeInform < now){
+                            data.informedMissing = true;
+                            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
+
+                            mainActivity.devicestatusChanged(id,"out of bus");
+                        }
+
+                        if(data.informedAlarmed)
+                            continue;
+
+
+                        if(data.firstFound + waitBeforeAlarm < now){
+                            data.informedAlarmed = true;
+
+                            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
+                            mainActivity.devicestatusChanged(id, "too long in bus");
+                        }
+                    }
+                    else
+                    {
+                        if(data.firstFound + waitBeforeInform < data.lastFound){
+                            data.informedFound = true;
+                            mainActivity.devicestatusChanged(id, "get in bus");
+                        }
                     }
                 }
 
