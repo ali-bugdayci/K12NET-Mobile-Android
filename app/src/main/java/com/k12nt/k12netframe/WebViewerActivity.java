@@ -5,7 +5,9 @@ import android.app.DownloadManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -79,6 +81,7 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
     private static final String BUSPOSITIONPAGE = "TGIJS.Web/WebParts/BusPositions".toLowerCase();
     private boolean collectDeviceData = false;
+    private boolean fixedOrientation = false;
     private DeviceHandler deviceHandler;
 
     @Override
@@ -546,7 +549,75 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
             webview.loadUrl("javascript:( function () { var resultSrc = document.head.outerHTML; window.HTMLOUT.htmlCallback(resultSrc); } ) ()");
         }
 
+        boolean shallWeFixOrientation = urlCheck.contains(BUSPOSITIONPAGE);
+        if(shallWeFixOrientation != fixedOrientation){
+            fixedOrientation = shallWeFixOrientation;
+
+            int orientation;
+            if(fixedOrientation)
+                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            else {
+                orientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+
+                //Stop data collection if we are already
+                if(collectDeviceData){
+                    collectDeviceData = false;
+                    resetDeviceCollection();
+                }
+            }
+
+            setRequestedOrientation(orientation);
+        }
+
         startUrl = url;
+    }
+
+    int countOccurrences(String haystack, char needle)
+    {
+        int count = 0;
+        for (int i=0; i < haystack.length(); i++)
+        {
+            if (haystack.charAt(i) == needle)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    //return : Normalized Value ie: ['a','b'] with quotes
+    public String arrayToString(final ArrayList<String> array){
+        String result = null;
+        for (String id : array) {
+            if(result != null)
+                result  += ", '" +  id + "'";
+            else
+                result  += "[ '" +  id + "'";
+        }
+        if(result == null)
+            result = "[]";
+        else
+            result += "]";
+
+        return result;
+    }
+
+    public void informDevicesOnBus(final ArrayList<String> devicesOnBus){
+
+        if(!devicesOnBus.isEmpty())
+        {
+            Resources res = getResources();
+            String text = res.getString(R.string.check_devices_near_bus, devicesOnBus.size());
+            Toast.makeText(getActivity(), text ,Toast.LENGTH_LONG).show();
+        }
+
+
+        webview.post(new Runnable() {
+            @Override
+            public void run() {
+                webview.loadUrl("javascript:( function () { var ele=document.getElementById('BtnTrigger'); if(!ele){return;} angular.element(ele).scope().ViewModel.EventOccured('getDevicesOnBus'," + arrayToString(devicesOnBus) +") } ) ()");
+            }
+        });
     }
 
     public void devicestatusChanged(final String key, final String status){
@@ -558,15 +629,18 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
         });
     }
 
-
-    private void resetDeviceCollection() {
+    private void initDeviceHandler(){
         if(deviceHandler == null)
             deviceHandler = new DeviceHandler(this);
+    }
 
+    private void resetDeviceCollection() {
         if(collectDeviceData)
             deviceHandler.startBind();
-        else
+        else{
+            deviceHandler.getDevicesOnBus();
             deviceHandler.reset();
+        }
 
     }
 
@@ -624,6 +698,12 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
     @Override
     public void onBackPressed() {
+
+        if(collectDeviceData){
+            Toast.makeText(getActivity(), R.string.stop_recording_first ,Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (webview.canGoBack()) {
             webview.goBack();
         } else {
@@ -799,15 +879,39 @@ public class WebViewerActivity extends K12NetActivity implements K12NetAsyncComp
 
 
         @JavascriptInterface
-        public void startGettingDeviceInfos() {
+        public void startGettingDeviceInfos(String deviceIDsConcat) {
+            initDeviceHandler();
+
+            String[] deviceIDs = deviceIDsConcat.split(",");
+
+            if(deviceIDs != null)
+                deviceHandler.setDeviceIDs(deviceIDs);
+
             collectDeviceData = true;
             resetDeviceCollection();
         }
 
         @JavascriptInterface
         public void stopGettingDeviceInfos() {
+            initDeviceHandler();
+
             collectDeviceData = false;
             resetDeviceCollection();
+        }
+
+
+        @JavascriptInterface
+        public void updateState(String stateParams) {
+            initDeviceHandler();
+
+            String[] states= stateParams.split(",");
+            if(states == null)
+                return;
+
+            String name  = states[0];
+            String value = states[1];
+
+            deviceHandler.updateState(name, value);
         }
     }
 

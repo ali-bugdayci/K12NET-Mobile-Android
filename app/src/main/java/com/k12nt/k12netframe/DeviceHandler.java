@@ -12,13 +12,19 @@ import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
-import org.altbeacon.beacon.*;
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
-
-import static android.R.attr.key;
-import static com.k12nt.k12netframe.R.string.status;
 
 /**
  * Created by ali-bugdayci on 11.12.2017.
@@ -27,15 +33,135 @@ import static com.k12nt.k12netframe.R.string.status;
 public class DeviceHandler implements BeaconConsumer {
 
     private static final String TAG = "DeviceHandler";
-    private static final double DISTANCE_TRESHOLD = 5; //meters
-    private static long waitBeforeInform = 60000; //1 min in ms
-    private static long waitBeforeAlarm = 720000; //2 hour in ms
+
+    public static final String GET_IN_BUS = "get in bus";
+    public static final String OUT_OF_BUS = "out of bus";
+    public static final String TOO_LONG_IN_BUS = "too long in bus";
+
+    private static double DISTANCE_TRESHOLD = 5; //meters
+    private static long waitBeforeInformFound = 5000; //5 secs in ms
+    private static long waitBeforeInformOut = 30000; //30 secs in ms
+    private static long waitBeforeAlarm = 7200000; //2 hour in ms
+
+    private static long refreshDevicesSince = 10000; //10 secs in ms
+
+
+    private static Float speed;
+    private static Float distance;
+
+    enum Beep  {
+        None,
+        Short,
+        Long
+    };
+
+    private static Beep beep =  Beep.None;
+
 
     WebViewerActivity mainActivity;
     private BeaconManager deviceManager;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 11;
     private static final int REQUEST_ENABLE_BT = 12;
+
+    HashSet<String> deviceIDs = new HashSet();
+
+    public void setDeviceIDs(String[] deviceIDArray) {
+        deviceIDs = new HashSet();
+        deviceIDs.addAll(Arrays.asList(deviceIDArray));
+    }
+
+    public void updateState(String name, String value) {
+        switch (name){
+            case "Speed":
+                try {
+                    speed = Float.valueOf(value);
+                }catch (NumberFormatException e){}
+
+                break;
+
+            case "Distance":
+                try {
+                    distance = Float.valueOf(value);
+                }catch (NumberFormatException e){}
+
+                break;
+
+            case "RefreshDeviceInfos":
+                try {
+                    refreshDevicesSince = Long.valueOf(value);
+                }catch (NumberFormatException e){}
+
+                refreshDeviceInfos();
+                break;
+
+            case "LongAlert":
+                beep = Beep.Long;
+                break;
+            
+            case "ShortBeep":
+                beep = Beep.Short;
+                break;
+
+            case "DistanceThreshold":
+                try {
+                    DISTANCE_TRESHOLD = Long.valueOf(value);
+                }catch (NumberFormatException e){}
+
+                break;
+
+            case "WaitBeforeInformFound":
+                try {
+                    waitBeforeInformFound = Long.valueOf(value);
+                }catch (NumberFormatException e){}
+
+                break;
+
+            case "WaitBeforeInformOut":
+                try {
+                    waitBeforeInformOut = Long.valueOf(value);
+                }catch (NumberFormatException e){}
+                break;
+
+            case "WaitBeforeAlarm":
+                try {
+                    waitBeforeAlarm = Long.valueOf(value);
+                }catch (NumberFormatException e){}
+                break;
+        }
+    }
+
+    public void getDevicesOnBus() {
+
+        Set<String> ids = devicesFound.keySet();
+
+        ArrayList<String> devicesStillinBus = new ArrayList<>(ids.size());
+        for (String id : ids) {
+            DeviceData data = devicesFound.get(id);
+
+
+            if (data.informedFound && !data.informedMissing)
+                devicesStillinBus.add(id);
+        }
+
+        mainActivity.informDevicesOnBus(devicesStillinBus);
+    }
+
+    private void refreshDeviceInfos() {
+        Set<String> ids = devicesFound.keySet();
+
+        long now = System.currentTimeMillis();
+
+        for (String id : ids) {
+            DeviceData data = devicesFound.get(id);
+
+
+            if(data.lastFound + refreshDevicesSince < now)
+                mainActivity.devicestatusChanged(id, OUT_OF_BUS);
+            else
+                mainActivity.devicestatusChanged(id, GET_IN_BUS);
+        }
+    }
 
     class DeviceData {
         public long firstFound;
@@ -100,6 +226,8 @@ public class DeviceHandler implements BeaconConsumer {
                     String minor = device.getId3().toString();
                     String key = major+ "-"+ minor;
 
+                    if(!deviceIDs.contains(key))
+                        continue;
                     /*
                     String log = "The devices I see is:" +device.getBeaconTypeCode()  + " : "+  device.getBluetoothName()+ " about "+device.getDistance()+" meters away.";
                     log += " Major minor: " + key ;
@@ -126,33 +254,21 @@ public class DeviceHandler implements BeaconConsumer {
                     DeviceData data = devicesFound.get(id);
                     if(data.informedFound)
                     {
-                        if(data.informedMissing)
+                        if(data.informedMissing){
+                            checkInBusAgain(now, id, data);
                             continue;
-
-                        if(data.lastFound + waitBeforeInform < now){
-                            data.informedMissing = true;
-                            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
-
-                            mainActivity.devicestatusChanged(id,"out of bus");
                         }
+
+                        checkOutOfBus(now, id, data);
 
                         if(data.informedAlarmed)
                             continue;
 
-
-                        if(data.firstFound + waitBeforeAlarm < now){
-                            data.informedAlarmed = true;
-
-                            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
-                            mainActivity.devicestatusChanged(id, "too long in bus");
-                        }
+                        checkTooLongInBus(now, id, data);
                     }
                     else
                     {
-                        if(data.firstFound + waitBeforeInform < data.lastFound){
-                            data.informedFound = true;
-                            mainActivity.devicestatusChanged(id, "get in bus");
-                        }
+                        checkInBus(id, data);
                     }
                 }
 
@@ -160,6 +276,38 @@ public class DeviceHandler implements BeaconConsumer {
                     Log.e(TAG, "No devices found.");
             }
         });
+    }
+
+    private void checkTooLongInBus(long now, String id, DeviceData data) {
+        if(data.firstFound + waitBeforeAlarm < now){
+            data.informedAlarmed = true;
+
+            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
+            mainActivity.devicestatusChanged(id, TOO_LONG_IN_BUS);
+        }
+    }
+
+    private void checkOutOfBus(long now, String id, DeviceData data) {
+        if(data.lastFound + waitBeforeInformOut < now){
+            data.informedMissing = true;
+            Log.e(TAG, id + " now: " + now + " firstFound: " + data.firstFound + " lastFound: " + data.lastFound);
+
+            mainActivity.devicestatusChanged(id, OUT_OF_BUS);
+        }
+    }
+
+    private void checkInBus(String id, DeviceData data) {
+        if(data.firstFound + waitBeforeInformFound < data.lastFound){
+            data.informedFound = true;
+            mainActivity.devicestatusChanged(id, GET_IN_BUS);
+        }
+    }
+
+    private void checkInBusAgain(long now, String id, DeviceData data) {
+        if(now < data.lastFound + waitBeforeInformFound){
+            data.informedMissing = false;
+            mainActivity.devicestatusChanged(id, GET_IN_BUS);
+        }
     }
 
     @Override

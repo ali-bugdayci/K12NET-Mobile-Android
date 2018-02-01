@@ -236,5 +236,8 @@
     <string name="readAccessAppSettings">Read External Storage permission allows us to read stored images. Please allow this permission in App Settings.</string>
     <string name="locationAccessAppSettings">Getting Location permission allows us to read current position and record if you want. Please allow this permission in App Settings.</string>
     <string name="resetPassword">Forgot Password</string>
-
+    <string name="location_access_title">Location access needed</string>
+    <string name="location_access_message">Location access needed for understanding Students in the Bus.</string>
+    <string name="stop_recording_first">Stop bus recording first.</string>
+    <string name="check_devices_near_bus">There are still %d devices near bus. Make sure everyone is out.</string>
 </resources>

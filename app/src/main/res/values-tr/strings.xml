@@ -236,5 +236,8 @@
     <string name="readAccessAppSettings">Eklentileri yükleyebilmek için "Okuma" yetkisi verilmelidir. Lütfen Android ayarlar kısmından bu "Okuma" yetkisini açın.</string>
     <string name="locationAccessAppSettings">Güncel pozisyonu kaydedebilmek için "Konum Erişim" yetkisi verilmelidir. Lütfen Android ayarlar kısmından bu "Konum Erişim" yetkisini açın.</string>
     <string name="resetPassword">Şifremi Unuttum</string>
-
+    <string name="location_access_title">Konumunuza erişim gerekmektedir</string>
+    <string name="location_access_message">Servisteki öğrencileri algılamak için konumunuza erişim gerekmektedir.</string>
+    <string name="stop_recording_first">Önce kaydı durdurmanız gerekmektedir.</string>
+    <string name="check_devices_near_bus">Hala yakında %d cihaz bulunmakta. Herkesin araçtan indiğine emin olunuz!</string>
 </resources>
