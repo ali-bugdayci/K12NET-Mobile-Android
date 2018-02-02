@@ -34,9 +34,9 @@ public class DeviceHandler implements BeaconConsumer {
 
     private static final String TAG = "DeviceHandler";
 
-    public static final String GET_IN_BUS = "get in bus";
-    public static final String OUT_OF_BUS = "out of bus";
-    public static final String TOO_LONG_IN_BUS = "too long in bus";
+    public static final String GET_IN_BUS = "DeviceFound";
+    public static final String OUT_OF_BUS = "DeviceMissing";
+    public static final String TOO_LONG_IN_BUS = "DeviceTooLongInBus";
 
     private static double DISTANCE_TRESHOLD = 5; //meters
     private static long waitBeforeInformFound = 5000; //5 secs in ms
